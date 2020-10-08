@@ -47,7 +47,7 @@ public class SeaBattle {
             UI.print.space();
             start();
         } catch (UI.input.CommandException.Exit e) {
-            System.exit(0);
+            System.exit(69);
         } catch (UI.input.CommandException e) {
             e.printStackTrace();
         }
