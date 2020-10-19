@@ -118,7 +118,7 @@ public class PC extends Player {
             for (int i = Field.MAX_BOAT_LENGTH; i > 0; i--) {
                 if (field.hasInStorage(i)) { len = i; break; };
             }
-            if (len == 0) {throw new AssertionError("Storage is empty");}
+            assert (len != 0) : "Storage is empty";
             while (true) {
                 boolean rotation = rand.bool();
                 int[] point1 = rand.coor(len);

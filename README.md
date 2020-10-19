@@ -1,5 +1,16 @@
 # SeaBattle
 
-### Short Java project
+##### The console game
+#### Includes 2 modes:
+1) Single
+2) Multiplayer
 
-##### Dmitriy Derbin
+In **single mode** you can play with another _player_
+or with _computer_
+
+In **multiplayer mode** you can connect with another 
+players via the virtual rooms
+
+
+##### Dmitriy Derbin 
+######PI19-5

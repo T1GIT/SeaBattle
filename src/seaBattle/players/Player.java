@@ -3,6 +3,7 @@ import seaBattle.elements.Boat;
 import seaBattle.elements.Field;
 import seaBattle.players.types.UI;
 
+
 public abstract class Player {
     final protected Field field;
 

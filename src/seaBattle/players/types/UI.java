@@ -12,7 +12,6 @@ public class UI extends Player {
     private boolean autoAction = false;
 
     public UI(String name) {
-
         super();
         if (name.equals("")) { name = "<Unknown>"; }
         this.name = name;
