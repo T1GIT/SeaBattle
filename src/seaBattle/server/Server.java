@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Server extends Thread{
     private static final String HOST = "localhost";
-    private static final int PORT = 5005;
-    public static List<Connect> connects = new ArrayList<>();
+    private static final int PORT = 4444;
+    private static final int MAX_CONNECTS = 50;
+    public static List<Connection> connects = new ArrayList<>(MAX_CONNECTS);
     private ServerSocket serverSocket;
 
     static public int getPort() { return PORT; }
@@ -18,9 +18,9 @@ public class Server extends Thread{
 
     public Server() {
         try {
-            InetAddress address = InetAddress.getByName(HOST);
-            serverSocket = new ServerSocket(PORT, 0, address);
-            System.out.println("Server is running: " + serverSocket.getLocalSocketAddress());
+            InetAddress addr = InetAddress.getByName(HOST);
+            serverSocket = new ServerSocket(PORT, MAX_CONNECTS, addr);
+//            System.out.println("Server is running: " + serverSocket.getLocalSocketAddress());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -29,17 +29,18 @@ public class Server extends Thread{
     public void run() {
         while (true) {
             try {
-                Connect clientConnection = new Connect(serverSocket.accept());
-                Server.connects.add(clientConnection);
-                System.out.println("    Client connected: " + clientConnection);
-            } catch (IOException ex) {
-                ex.printStackTrace();
+                Connection connection = new Connection(serverSocket.accept());
+                sendMessageAll("added: " + connection.toString());
+                Server.connects.add(connection);
+//                System.out.println("    Client connected: " + connection);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
     public void sendMessageAll(String msg) {
-        for(Connect client : connects) {
+        for(Connection client : connects) {
             client.send(msg);
         }
     }

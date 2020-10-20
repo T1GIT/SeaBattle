@@ -4,8 +4,10 @@ import seaBattle.players.Player;
 import seaBattle.players.types.*;
 
 public abstract class GameMode {
-    private final byte MAX_PLAYERS = 2;
+    private static final byte MAX_PLAYERS = 2;
     protected final Player[] players = new Player[MAX_PLAYERS];
+
+    public static byte getMaxPlayers() { return MAX_PLAYERS; }
 
     public GameMode(String userName) {
         this.players[0] = userName.toLowerCase().equals("pc") ? new PC() : new UI(userName);

@@ -85,8 +85,8 @@ public class Single extends GameMode {
 
     @Override
     public String mainLoop() throws UI.input.CommandException {
-        int move = PC.rand.inRange(0, players.length - 1);
-        int len = players.length;
+        int len = GameMode.getMaxPlayers();
+        int move = PC.rand.inRange(0, len - 1);
         Player attacking;
         Player defencing;
         while (true) {
