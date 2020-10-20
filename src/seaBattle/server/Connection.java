@@ -26,7 +26,7 @@ public class Connection extends Thread {
             while (true) {
                 System.out.print("Client: ");
                 String clientMessage = (String) in.readObject();
-                out.writeObject("Answer from server");
+                out.writeObject(new Scanner(System.in).nextLine());
                 System.out.println(clientMessage);
             }
         } catch (ClassNotFoundException | IOException e) {
