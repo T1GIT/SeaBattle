@@ -1,7 +1,7 @@
 package seaBattle.elements;
 
-
 import java.util.HashSet;
+
 
 public class Field {
     final public static byte SIZE = 10;

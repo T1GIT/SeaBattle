@@ -7,18 +7,12 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class UI extends Player {
-    final private String name;
     private boolean autoBoat = false;
     private boolean autoAction = false;
 
     public UI(String name) {
-        super();
-        if (name.equals("")) { name = "<Unknown>"; }
-        this.name = name;
+        super(name.equals("") ? "<Unknown>" : name);
     }
-
-    @Override
-    public String getName() { return this.name; }
 
     @Override
     public boolean isHuman() { return true; }

@@ -3,8 +3,6 @@ package seaBattle.players.types;
 import seaBattle.elements.*;
 import seaBattle.players.Player;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Random;
 
 public class PC extends Player {
@@ -12,10 +10,7 @@ public class PC extends Player {
     private int[] lastWoundCoor;
     private int[] lastHitCoor;
 
-    public PC() { super(); }
-
-    @Override
-    public String getName() { return "PC"; }
+    public PC() { super("PC"); }
 
     @Override
     public boolean isHuman() { return false; }
