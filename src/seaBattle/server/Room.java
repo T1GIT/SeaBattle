@@ -1,36 +1,34 @@
 package seaBattle.server;
 
-import org.jetbrains.annotations.NotNull;
 import seaBattle.modes.GameMode;
-import seaBattle.players.Player;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Comparator;
-import java.util.SortedSet;
+import java.util.List;
+import java.util.ListIterator;
 
 public class Room {
     private final String name;
-    private final Player[] players = new Player[GameMode.getMaxPlayers()];
+    private final Connection[] conns = new Connection[GameMode.getMaxPlayers()];
     private int move = 0;
     private byte[] psw;
 
     public String getName() { return name; }
 
-    public Room(String name, Player player) {
+    public Room(String name, Connection connection) {
         this.name = name;
-        players[0] = player;
+        conns[0] = connection;
     }
 
-    public Room(String name, Player player, String psw) {
-        this(name, player);
+    public Room(String name, Connection connection, String psw) {
+        this(name, connection);
         this.psw = hash(psw);
     }
 
-    public void connect(Player player) { players[1] = player; }
+    public void connect(Connection connection) { conns[1] = connection; }
 
-    public boolean isLocked() { return this.psw.length > 0; }
+    public boolean isLocked() { return this.psw != null; }
 
     public byte[] hash(String str) {
         try {
@@ -44,5 +42,17 @@ public class Room {
 
     public boolean checkPsw(String psw) {
         return hash(psw) == this.psw;
+    }
+
+    public static String[] getPrinted(List<Room> roomList) {
+        String[] res = new String[roomList.size()];
+        ListIterator<Room> iter = roomList.listIterator();
+        while (iter.hasNext()) {
+            int num = iter.nextIndex();
+            Room room = iter.next();
+            String lock = room.isLocked() ? "\uD83D\uDD12" : "";
+            res[num] = String.format("%2d %2s %s", num, lock, room.name);
+        }
+        return res;
     }
 }

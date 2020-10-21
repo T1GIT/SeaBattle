@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Server extends Thread{
@@ -20,7 +21,7 @@ public class Server extends Thread{
         try {
             InetAddress addr = InetAddress.getByName(HOST);
             serverSocket = new ServerSocket(PORT, MAX_CONNECTS, addr);
-//            System.out.println("Server is running: " + serverSocket.getLocalSocketAddress());
+            System.out.println("Server is running: " + serverSocket.getLocalSocketAddress());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,7 +33,7 @@ public class Server extends Thread{
                 Connection connection = new Connection(serverSocket.accept());
                 sendMessageAll("added: " + connection.toString());
                 Server.connects.add(connection);
-//                System.out.println("    Client connected: " + connection);
+                System.out.println("    Client connected: " + connection);
             } catch (IOException e) {
                 e.printStackTrace();
             }

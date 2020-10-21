@@ -56,7 +56,7 @@ public class PC extends Player {
                         default: coor = new int[]{x, y};
                     }
                     if (Field.isOver(coor[0], coor[1])) continue;
-                    if (enemyField.getPoint(coor).isAvailable()) {break;}
+                    if (enemyField.getPoint(coor).isAttackable()) {break;}
                 }
             }
         } else {  // No one wounded point
@@ -127,7 +127,7 @@ public class PC extends Player {
         public static int[] action(Field field) { // Without logic!
             while (true) {
                 int[] coor = coor();
-                if (field.getPoint(coor).isAvailable()) return coor;
+                if (field.getPoint(coor).isAttackable()) return coor;
             }
         }
     }

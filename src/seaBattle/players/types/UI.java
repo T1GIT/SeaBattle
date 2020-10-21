@@ -93,7 +93,7 @@ public class UI extends Player {
                     System.out.println("Attacking one point second time isn't good idea (๏̯͡๏)");
                 } else {
                     Point point = enemyField.getPoint(x, y);
-                    if (point.isAvailable()) return new int[]{x, y};
+                    if (point.isAttackable()) return new int[]{x, y};
                     else System.out.println("Attacking one point second time isn't good idea (๏̯͡๏)");
                 }
             } catch (InputMismatchException e) { incorrectInput(); }

@@ -1,6 +1,6 @@
 package seaBattle.elements;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 
 
 public class Field {
@@ -10,12 +10,29 @@ public class Field {
     final private int[] unusedBoats;
     final private int[] aliveBoats;
 
-    public Point getPoint(int[] coor) { return table[coor[1]][coor[0]]; }
-    public Point getPoint(int x, int y) { return table[y][x]; }
-    public int[] getStorage() { return unusedBoats; }
-    public int[] getAlives() { return aliveBoats; }
-    public static boolean inBounds(int coor ) { return coor >= 0 && coor < SIZE; }
-    public static boolean isOver(int x, int y ) { return !inBounds(x) || !inBounds(y); }
+    public Point getPoint(int[] coor) {
+        return table[coor[1]][coor[0]];
+    }
+
+    public Point getPoint(int x, int y) {
+        return table[y][x];
+    }
+
+    public int[] getStorage() {
+        return unusedBoats;
+    }
+
+    public int[] getAlives() {
+        return aliveBoats;
+    }
+
+    public static boolean inBounds(int coor) {
+        return coor >= 0 && coor < SIZE;
+    }
+
+    public static boolean isOver(int x, int y) {
+        return !inBounds(x) || !inBounds(y);
+    }
 
     public Field() {
         this.table = new Point[SIZE][SIZE];
@@ -35,8 +52,10 @@ public class Field {
     }
 
     public boolean placeIsEmpty(int x1, int y1, int x2, int y2) {
-        x1 = Math.max(0, x1 - 1); x2 = Math.min(x2 + 1, SIZE - 1);
-        y1 = Math.max(0, y1 - 1); y2 = Math.min(y2 + 1 , SIZE - 1);
+        x1 = Math.max(0, x1 - 1);
+        x2 = Math.min(x2 + 1, SIZE - 1);
+        y1 = Math.max(0, y1 - 1);
+        y2 = Math.min(y2 + 1, SIZE - 1);
         for (int _x = x1; _x <= x2; _x++) {
             for (int _y = y1; _y <= y2; _y++) {
                 if (!this.table[_y][_x].isEmpty()) {
@@ -47,27 +66,43 @@ public class Field {
         return true;
     }
 
-    public boolean placeIsEmpty(int[] p1, int[] p2) { return placeIsEmpty(p1[0], p1[1], p2[0], p2[1]); }
+    public boolean placeIsEmpty(int[] p1, int[] p2) {
+        return placeIsEmpty(p1[0], p1[1], p2[0], p2[1]);
+    }
 
-    public boolean hasInStorage(int length) { return unusedBoats[length - 1] > 0; }
+    public boolean hasInStorage(int length) {
+        return unusedBoats[length - 1] > 0;
+    }
 
     public boolean isStorageEmpty() {
-        for (int am: unusedBoats) {
-            if (am != 0) {return false;}
+        for (int am : unusedBoats) {
+            if (am != 0) {
+                return false;
+            }
         }
         return true;
     }
 
     public boolean isLose() {
-        for (int am: aliveBoats) {
-            if (am != 0) {return false;}
+        for (int am : aliveBoats) {
+            if (am != 0) {
+                return false;
+            }
         }
         return true;
     }
 
+    /**
+     * @param x coordinate for attack this {@code field}
+     * @param y coordinate for attack this {@code field}
+     * @return result of attack {@code state} :
+     * 0 - passed
+     * 1 - wounded
+     * 2 - killed
+     */
     public int attack(int x, int y) {
         Point p = table[y][x];
-        int state;  // 0 - passed; 1 - wounded; 2 - killed
+        int state;
         if (p.isEmpty()) {
             p.pass();
             state = 0;
@@ -90,6 +125,11 @@ public class Field {
         return state;
     }
 
+    /**
+     * Places boat in the field without any checks
+     *
+     * @param boat for placing
+     */
     public void setBoat(Boat boat) {
         byte[] xDist = boat.getxPos();
         byte[] yDist = boat.getyPos();
@@ -103,10 +143,15 @@ public class Field {
         aliveBoats[length - 1]++;
     }
 
+    /**
+     * @param boat for checking
+     * @return {@code Point[]}, including all {@code Point}s around
+     * the {@code boat}
+     */
     private Point[] getEnv(Boat boat) {
         byte[] xPos = boat.getxPos();
         byte[] yPos = boat.getyPos();
-        HashSet<Point> env = new HashSet<>();
+        ArrayList<Point> env = new ArrayList<>();
         int x1 = Math.max(0, xPos[0] - 1);
         int x2 = Math.min(xPos[1] + 1, SIZE - 1);
         int y1 = Math.max(0, yPos[0] - 1);
@@ -121,10 +166,15 @@ public class Field {
         return env.toArray(Point[]::new);
     }
 
+    /**
+     * @param boat for checking
+     * @return {@code Point[]}, including all {@code Point}s
+     * that {@code boat} engages
+     */
     private Point[] getBoatPoints(Boat boat) {
         byte[] xPos = boat.getxPos();
         byte[] yPos = boat.getyPos();
-        HashSet<Point> boatPoints = new HashSet<>();
+        ArrayList<Point> boatPoints = new ArrayList<>(boat.length());
         for (byte _x = xPos[0]; _x <= xPos[1]; _x++) {
             for (byte _y = yPos[0]; _y <= yPos[1]; _y++) {
                 boatPoints.add(this.table[_y][_x]);
@@ -138,31 +188,35 @@ public class Field {
         int leftAlign = (LINE_LEN - name.length()) / 2;
         int rightAlign = LINE_LEN - leftAlign - name.length();
         final String[] res = new String[SIZE + 6];
-        res[0] = "┏ " + String.valueOf("━━ ").repeat(LINE_LEN / 3 + 2) + "━┓";
+        res[0] = "┏ " + "━━ ".repeat(LINE_LEN / 3 + 2) + "━┓";
         res[1] = "┃" + String.valueOf(' ').repeat(leftAlign + 4) + name + String.valueOf(' ').repeat(rightAlign + 4) + "┃";
-        res[2] = "┣ ━━━ ┳ " + String.valueOf("━━ ").repeat(LINE_LEN / 3) + "━┫";
+        res[2] = "┣ ━━━ ┳ " + "━━ ".repeat(LINE_LEN / 3) + "━┫";
         StringBuilder numbers = new StringBuilder();
         numbers.append("┃     ┃ ");
-        for (int i = 0; i < SIZE; i++) { numbers.append(" " + i + " "); }
+        for (int i = 0; i < SIZE; i++) {
+            numbers.append(" ").append(i).append(" ");
+        }
         numbers.append(" ┃");
         res[3] = numbers.toString();
-        res[4] = "┣ ━━━ ╋ " + String.valueOf("━━ ").repeat(LINE_LEN / 3) + "━┫";
+        res[4] = "┣ ━━━ ╋ " + "━━ ".repeat(LINE_LEN / 3) + "━┫";
         for (int row = 0; row < SIZE; row++) {
             StringBuilder str = new StringBuilder();
-            str.append("┃  " + row + "  ┃ ");
+            str.append("┃  ").append(row).append("  ┃ ");
             for (int col = 0; col < SIZE; col++) {
                 char symbol = table[row][col].draw();
                 if (table[row][col].isAlive() && hidden) {
                     symbol = Point.getStateSign(0);
                 }
-                str.append(" " + symbol + " ");
+                str.append(" ").append(symbol).append(" ");
             }
             str.append(" ┃");
             res[5 + row] = str.toString();
         }
-        res[SIZE + 5] = "┗ ━━━ ┻ " + String.valueOf("━━ ").repeat(LINE_LEN / 3) + "━┛";
+        res[SIZE + 5] = "┗ ━━━ ┻ " + "━━ ".repeat(LINE_LEN / 3) + "━┛";
         return res;
     }
 
-    public String[] getPrinted(String name) { return getPrinted(name, false); }
+    public String[] getPrinted(String name) {
+        return getPrinted(name, false);
+    }
 }
