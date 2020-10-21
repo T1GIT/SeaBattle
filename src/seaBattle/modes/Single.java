@@ -4,7 +4,6 @@ import seaBattle.elements.Field;
 import seaBattle.players.Player;
 import seaBattle.players.types.PC;
 import seaBattle.players.types.UI;
-import seaBattle.rooms.types.LocalRoom;
 
 public class Single extends GameMode {
     public Single(String userName) { super(userName); }
@@ -15,8 +14,8 @@ public class Single extends GameMode {
         System.out.println("             Welcome to ＳＩＮＧＬＥ　ＭＯＤＥ, Dear " + players[0].getName() + "! ヽ(・∀・)ﾉ");
         UI.print.line();
         for (int i = 1; i < GameMode.getMaxPlayers(); i++) {
-            if (room.get(i-1).isHuman()) { UI.print.space(); }
-            room.conn = findPlayer(room.get(i-1).getName());
+            if (players[i-1].isHuman()) { UI.print.space(); }
+            players[i] = findPlayer(players[i-1].getName());
         }
         for (int i = 0; i < GameMode.getMaxPlayers(); i++) {
             if (i > 0 && players[i-1].isHuman()) { UI.print.space(); }
@@ -98,21 +97,14 @@ public class Single extends GameMode {
         Player attacking;
         Player defencing;
         while (true) {
-            for (int i = 0; i < len - 1; i++) {
-                int num = (move + i) % len;
-                if (!players[num].isLose()) attacking = players[num];
-            }
-            for (int i = 1; i < len; i++) {
-                int num = (move + i) % len;
-                if (!players[num].isLose()) defencing = players[num];
-            }
-            if (defencing == attacking) break;
+            attacking = players[move % len];
+            defencing = players[(move + 1) % len];
             int[] action = attacking.getAction(defencing);
             int answer = defencing.attackMe(action);
             attacking.retAnswer(answer);
+            if (defencing.isLose()) break;
             if (answer == 0) move++;
         }
-        assert attacking != null;
         return attacking.getName();
     }
 }
