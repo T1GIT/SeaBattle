@@ -46,7 +46,7 @@ public class Point {
             case 0: this.state = 4; break;
             case 1: this.state = 2; break;
             case 2: this.state = 3; break;
-            default: throw new InputMismatchException("Answer can be: 0, 1, 2, but given: " + answer);
+            default: throw new IllegalStateException("Unexpected answer: " + answer);
         }
     }
 }

@@ -21,6 +21,7 @@ public class Connection extends Thread {
         start();
     }
 
+    @Override
     public void run() {
         try {
             while (true) {
@@ -33,6 +34,7 @@ public class Connection extends Thread {
             try {
                 socket.close();
                 System.out.println("Client disconnected: " + this);
+                interrupt();
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }

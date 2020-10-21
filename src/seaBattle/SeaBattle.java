@@ -8,6 +8,7 @@ import seaBattle.players.types.*;
 
 public class SeaBattle {
 
+
     public void start() {
         try {
             System.out.println("\n" +
@@ -32,7 +33,7 @@ public class SeaBattle {
             System.out.println("                         Nice to meet You, " + userName + "! (*^‿^*)");
             UI.print.line();
             System.out.println("Please choose mode for game: \n" +
-                    "    0 - Single (Fight with your PC)\n" +
+                    "    0 - Single (Fight with local players)\n" +
                     "    1 - Multiplayer (Play with gamers around the world)\n" +
                     ">>> Make your choice ヽ(o^―^o)ﾉ");
             int gameMode = UI.input.mode(1);
@@ -40,7 +41,7 @@ public class SeaBattle {
             switch (gameMode) {
                 case 0: game = new Single(userName); break;
                 case 1: game = new Multiplayer(userName); break;
-                default: throw new AssertionError("Unknown game mode " + gameMode);
+                default: throw new IllegalStateException("Unknown game mode " + gameMode);
             }
             game.play();
         } catch (UI.input.CommandException e) {

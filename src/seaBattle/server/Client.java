@@ -33,7 +33,6 @@ public class Client {
                 out.writeObject(new Scanner(System.in).nextLine());
                 String serverMessage = (String) in.readObject();
                 System.out.println(serverMessage);
-//                out.writeObject("OK : " + new Scanner(System.in).nextLine());
             }
         } catch (IOException | ClassNotFoundException e) {
             try {
