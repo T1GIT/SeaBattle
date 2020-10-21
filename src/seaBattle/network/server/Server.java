@@ -1,9 +1,12 @@
 package seaBattle.network.server;
 
+import seaBattle.rooms.types.WebRoom;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class Server extends Thread{
@@ -11,9 +14,10 @@ public class Server extends Thread{
     private static final String HOST = "localhost";
     private static final int PORT = 4444;
     private static final int MAX_CONNECTS = 50;
-    private final List<Connection> connects = new ArrayList<>(MAX_CONNECTS);
-    private final List<Room> freeRooms = new ArrayList<>();
-    private final List<Room> engagedRooms = new ArrayList<>();
+    private static final int MAX_ROOMS = (MAX_CONNECTS + 1) / 2;
+    private final HashSet<Connection> connects = new HashSet<>(MAX_CONNECTS);
+    private final ArrayList<WebRoom> freeRooms = new ArrayList<>(MAX_ROOMS);
+    private final ArrayList<WebRoom> engagedRooms = new ArrayList<>(MAX_ROOMS);
 
     static public int getPort() { return PORT; }
     static public String getHost() { return HOST; }

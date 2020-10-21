@@ -1,8 +1,8 @@
 package seaBattle.rooms.types;
 
 import seaBattle.modes.GameMode;
+import seaBattle.network.server.Connection;
 import seaBattle.rooms.Room;
-import seaBattle.server.Connection;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -19,6 +19,8 @@ public class WebRoom
     private final String name;
     private byte[] psw;
 
+    public String getName() { return name; }
+
     public WebRoom(String name, Connection connection) {
         this.name = name;
         network[0] = connection;
@@ -29,9 +31,10 @@ public class WebRoom
         this.psw = Security.hash(psw);
     }
 
-    public String getName() { return name; }
-
-
+    @Override
+    public Connection[] next() {
+        return new Connection[0];
+    }
 
     public static String[] getPrinted(List<WebRoom> roomList) {
         String[] res = new String[roomList.size()];
@@ -43,11 +46,6 @@ public class WebRoom
             res[num] = String.format("%2d %2s %s", num, lock, room.name);
         }
         return res;
-    }
-
-    @Override
-    public Connection[] next() {
-        return new Connection[0];
     }
 
     private static class Security {

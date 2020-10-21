@@ -1,5 +1,6 @@
-package seaBattle.modes;
+package seaBattle.modes.types;
 
+import seaBattle.modes.GameMode;
 import seaBattle.players.Player;
 import seaBattle.players.types.UI;
 

@@ -1,8 +1,8 @@
 package seaBattle;
 
 import seaBattle.modes.GameMode;
-import seaBattle.modes.Multiplayer;
-import seaBattle.modes.Single;
+import seaBattle.modes.types.Multiplayer;
+import seaBattle.modes.types.Single;
 import seaBattle.players.types.*;
 
 
