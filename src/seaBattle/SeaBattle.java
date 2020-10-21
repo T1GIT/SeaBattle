@@ -8,6 +8,7 @@ import seaBattle.players.types.*;
 
 public class SeaBattle {
 
+
     public void start() {
         try {
             System.out.println("\n" +

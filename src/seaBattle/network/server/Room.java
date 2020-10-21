@@ -1,4 +1,4 @@
-package seaBattle.server;
+package seaBattle.network.server;
 
 import seaBattle.modes.GameMode;
 
