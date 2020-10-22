@@ -1,4 +1,6 @@
-package seaBattle.network.server;
+package seaBattle.network;
+
+import seaBattle.modes.GameMode;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,24 +24,27 @@ public class Connection
 
     @Override
     public void run() {
+        while (super.isAlive()) {
+            System.out.println(this.getName() + "|" + receive());
+        }
+    }
+
+    @Override
+    public void send(Object data) {
         try {
-            while (super.isAlive()) {
-                System.out.println(this.toString() + "|" + receive());
-            }
-        } catch (IOException | ClassNotFoundException e) { disconnect(); }
+            out.writeObject(data);
+        } catch (IOException e) { disconnect(); }
     }
 
     @Override
-    public void send(Object data) throws IOException {
-        out.writeObject(data);
-    }
-
-    @Override
-    public Object receive() throws IOException, ClassNotFoundException {
+    public Object receive() {
         Object res = null;
-        do {
-            res = in.readObject();
-        } while (res == null);
+        try {
+            do {
+                res = in.readObject();
+            } while (res == null);
+        } catch (IOException e) { disconnect();
+        } catch (ClassNotFoundException e) { e.printStackTrace(); }
         return res;
     }
 

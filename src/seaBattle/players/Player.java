@@ -1,12 +1,13 @@
 package seaBattle.players;
-import seaBattle.elements.Boat;
-import seaBattle.elements.Field;
+import seaBattle.field.Boat;
+import seaBattle.field.Field;
 import seaBattle.players.types.UI;
 
 
 public abstract class Player {
-    final protected Field field;
-    final private String name;
+    public final static int MAX_NAME_LENGTH = Field.SIZE + 2;
+    protected final Field field;
+    private final String name;
 
     public Field getField() { return this.field; }
     public String getName() { return this.name; }
@@ -16,6 +17,7 @@ public abstract class Player {
      * @param name player's name
      */
     public Player(String name) {
+        assert (name.length() <= MAX_NAME_LENGTH): "Given name longer then available: " + name;
         this.field = new Field();
         this.name = name;
     }
@@ -32,7 +34,7 @@ public abstract class Player {
     /**
      * @return True if player have no alive boat on its field
      */
-    public boolean isLose() { return this.field.isLose(); }
+    public boolean isAlive() { return this.field.isAlive(); }
 
     /**
      * @return True if player isn't {@code PC}

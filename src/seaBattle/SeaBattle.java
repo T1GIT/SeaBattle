@@ -1,7 +1,6 @@
 package seaBattle;
 
 import seaBattle.modes.GameMode;
-import seaBattle.modes.types.Multiplayer;
 import seaBattle.modes.types.Single;
 import seaBattle.players.types.*;
 
@@ -28,7 +27,7 @@ public class SeaBattle {
 
             System.out.println("\n\n        Hello, my Dear Friend! Let's play in SEA BATTLE ヽ(*⌒▽⌒*)ﾉ\n\n" +
                     ">>> How I can call You? (ಠ_ಠ)");
-            String userName = UI.input.name();
+            String userName = UI.input.playerName();
             UI.print.line();
             System.out.println("                         Nice to meet You, " + userName + "! (*^‿^*)");
             UI.print.line();
@@ -40,7 +39,7 @@ public class SeaBattle {
             GameMode game;
             switch (gameMode) {
                 case 0: game = new Single(userName); break;
-                case 1: game = new Multiplayer(userName); break;
+//                case 1: game = new Multiplayer(userName); break;
                 default: throw new IllegalStateException("Unknown game mode " + gameMode);
             }
             game.play();

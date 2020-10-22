@@ -2,24 +2,9 @@ package seaBattle.modes;
 
 import seaBattle.players.Player;
 import seaBattle.players.types.*;
-import seaBattle.rooms.Room;
-import seaBattle.rooms.types.LocalRoom;
 
 public abstract class GameMode {
-    private static final byte MAX_PLAYERS = 2;
-    protected final LocalRoom room = new LocalRoom();
-
-    public static byte getMaxPlayers() { return MAX_PLAYERS; }
-
-    /**
-     * Constructs the game including one player
-     * @param userName contains name of the game's initiator
-     */
-    public GameMode(String userName) {
-
-        this.players[0] = userName.toLowerCase().equals("pc") ? new PC() : new UI(userName);
-
-    }
+    public static final byte MAX_PLAYERS = 2;
 
     /**
      * The main body of the game.

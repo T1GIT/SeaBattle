@@ -1,6 +1,4 @@
-package seaBattle.elements;
-
-import java.util.InputMismatchException;
+package seaBattle.field;
 
 public class Point {
     private Boat boat;

@@ -1,35 +1,41 @@
 package seaBattle.players.types;
 
-import seaBattle.elements.Boat;
+import seaBattle.field.Boat;
+import seaBattle.network.Connection;
 import seaBattle.players.Player;
 
-public class WEB extends Player {
-    public WEB(String name) {
-        super(name);
-    }
 
-    @Override
-    public String getName() {
-        return null;
+public class WEB extends Player {
+    private final Connection conn;
+
+    public WEB(String name, Connection connection) {
+        super(name);
+        this.conn = connection;
     }
 
     @Override
     public boolean isHuman() {
-        return false;
+        return true;
     }
 
     @Override
-    public Boat getBoat() throws UI.input.CommandException {
-        return null;
+    public Boat getBoat() {
+        Object[] raw = (Object[]) conn.receive();
+        int[] coors = new int[4];
+        for (int i = 0; i < raw.length; i++) coors[i] = (int) raw[i];
+        return new Boat(coors);
     }
 
     @Override
-    public int[] getAction(Player enemy) throws UI.input.CommandException {
-        return new int[0];
+    public int[] getAction(Player enemy) {
+        Object[] raw = (Object[]) conn.receive();
+        int[] coor = new int[2];
+        for (int i = 0; i < raw.length; i++) coor[i] = (int) raw[i];
+        return coor;
     }
 
     @Override
     public void retAnswer(int code) {
-
+        conn.send(code);
     }
 }

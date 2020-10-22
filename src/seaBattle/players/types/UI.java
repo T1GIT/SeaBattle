@@ -1,8 +1,11 @@
 package seaBattle.players.types;
 
-import seaBattle.elements.*;
+import seaBattle.field.*;
 import seaBattle.players.Player;
+import seaBattle.rooms.WebRoom;
 
+import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -151,24 +154,27 @@ public class UI extends Player {
         }
 
         public static void space() {
-            final int SPACE=10;
-            System.out.print(String.valueOf("\n").repeat(SPACE));
+            final int SPACE = 20;
+            System.out.print("\n".repeat(SPACE));
         }
 
         public static void line() {
-            for (int i = 0; i < 100; i++) {
-                System.out.print('⎯');
-            }
-            System.out.println();
+            final int LEN = 130;
+            System.out.println("⎯".repeat(LEN));
         }
     }
 
     public static class input {
+
         public static class CommandException extends Exception {
+            CommandException() {}
+            CommandException(String msg) { super(msg); }
+
             public static class Exit extends CommandException {}
             public static class Reset extends CommandException {}
             public static class RandomBoat extends CommandException {}
             public static class RandomField extends CommandException {}
+            public static class Chat extends CommandException {public Chat(String msg) {super(msg);}}
         }
 
         public static int mode(int maxVal) throws CommandException {
@@ -185,13 +191,25 @@ public class UI extends Player {
             }
         }
 
-        public static String name() throws CommandException {
-            final int MAX_NAME = Field.SIZE + 2;
+        public static String roomName() {
+            while (true) {
+                System.out.print("Room name: ");
+                String res = new Scanner(System.in).nextLine();
+                if (res.length() > WebRoom.MAX_NAME_LENGTH) {
+                    System.out.println("          Unfortunately, this name is too long (maximum length is " + WebRoom.MAX_NAME_LENGTH + " symbols)");
+                    print.line();
+                } else {
+                    return res;
+                }
+            }
+        }
+
+        public static String playerName() {
             while (true) {
                 System.out.print("Name: ");
                 String res = new Scanner(System.in).nextLine();
-                if (res.length() > MAX_NAME) {
-                    System.out.println("          Unfortunately, this name is too long (maximum length is " + MAX_NAME + " symbols)");
+                if (res.length() > Player.MAX_NAME_LENGTH) {
+                    System.out.println("          Unfortunately, this name is too long (maximum length is " + Player.MAX_NAME_LENGTH + " symbols)");
                     print.line();
                 } else {
                     return res;
@@ -206,6 +224,7 @@ public class UI extends Player {
                 case "exit": throw new CommandException.Exit();
                 case "r": throw new CommandException.RandomBoat();
                 case "random": throw new CommandException.RandomField();
+                case "chat": throw new CommandException.Chat(String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length)));
                 default: {
                     int[] res = new int[cmd.length];
                     try { for (int i = 0; i < cmd.length; i++) res[i] = Integer.parseInt(cmd[i]); }

@@ -1,26 +1,34 @@
 package seaBattle.modes.types;
 
-import seaBattle.elements.Field;
+import seaBattle.field.Field;
 import seaBattle.modes.GameMode;
 import seaBattle.players.Player;
 import seaBattle.players.types.PC;
 import seaBattle.players.types.UI;
+import seaBattle.rooms.Room;
 
 public class Single extends GameMode {
-    public Single(String userName) { super(userName); }
+    private final Room room = new Room();
+
+    public Single(String userName) {
+        room.connect(
+                userName.toLowerCase().equals("pc")
+                        ? new PC()
+                        : new UI(userName));
+    }
 
     @Override
     public void play() throws UI.input.CommandException  {
         UI.print.line();
-        System.out.println("             Welcome to ＳＩＮＧＬＥ　ＭＯＤＥ, Dear " + players[0].getName() + "! ヽ(・∀・)ﾉ");
+        System.out.println("             Welcome to ＳＩＮＧＬＥ　ＭＯＤＥ, Dear " + room.getPlayer(0).getName() + "! ヽ(・∀・)ﾉ");
         UI.print.line();
-        for (int i = 1; i < GameMode.getMaxPlayers(); i++) {
-            if (players[i-1].isHuman()) { UI.print.space(); }
-            players[i] = findPlayer(players[i-1].getName());
+        for (int i = 1; i < room.getSize(); i++) {
+            Player lastPlayer = room.getPlayer(i-1);
+            room.connect(findPlayer(lastPlayer.getName()));
         }
-        for (int i = 0; i < GameMode.getMaxPlayers(); i++) {
-            if (i > 0 && players[i-1].isHuman()) { UI.print.space(); }
-            fillField(players[i]);
+        for (int i = 0; i < GameMode.MAX_PLAYERS; i++) {
+            if (i > 0 && room.getPlayer(i-1).isHuman()) { UI.print.space(); }
+            fillField(room.getPlayer(i));
         }
         System.out.println("\n\n              \uD835\uDD43\uD835\uDD56\uD835\uDD65❜\uD835\uDD64 \uD835\uDD64\uD835\uDD65\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD63\uD835\uDD65!  ►\n\n");
         String winnerName = mainLoop();
@@ -69,7 +77,7 @@ public class Single extends GameMode {
             case 1:
                 System.out.println("Oh, it's incredible, so many people in there (O.O)\n" +
                         ">>> What's your name, Stranger?");
-                player = new UI(UI.input.name());
+                player = new UI(UI.input.playerName());
                 break;
             default: throw new IllegalStateException("Unexpected value: " + gameMode);
         }
@@ -93,19 +101,17 @@ public class Single extends GameMode {
 
     @Override
     public String mainLoop() throws UI.input.CommandException {
-        int len = GameMode.getMaxPlayers();
-        int move = PC.rand.inRange(0, len - 1);
         Player attacking;
         Player defencing;
-        while (true) {
-            attacking = players[move % len];
-            defencing = players[(move + 1) % len];
+        room.start();
+        do {
+            attacking = room.getAttacking();
+            defencing = room.getDefencing();
             int[] action = attacking.getAction(defencing);
             int answer = defencing.attackMe(action);
             attacking.retAnswer(answer);
-            if (defencing.isLose()) break;
-            if (answer == 0) move++;
-        }
+            room.next();
+        } while (room.hasNext());
         return attacking.getName();
     }
 }

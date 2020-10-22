@@ -1,26 +1,23 @@
-package seaBattle.network.server;
+package seaBattle.network;
 
-import seaBattle.rooms.types.WebRoom;
+import seaBattle.rooms.WebRoom;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+
 
 public class Server extends Thread{
     private ServerSocket serverSocket;
-    private static final String HOST = "localhost";
-    private static final int PORT = 4444;
-    private static final int MAX_CONNECTS = 50;
-    private static final int MAX_ROOMS = (MAX_CONNECTS + 1) / 2;
+    public static final String HOST = "localhost";
+    public static final int PORT = 4444;
+    public static final int MAX_CONNECTS = 50;
+    public static final int MAX_ROOMS = (MAX_CONNECTS + 1) / 2;
     private final HashSet<Connection> connects = new HashSet<>(MAX_CONNECTS);
     private final ArrayList<WebRoom> freeRooms = new ArrayList<>(MAX_ROOMS);
     private final ArrayList<WebRoom> engagedRooms = new ArrayList<>(MAX_ROOMS);
-
-    static public int getPort() { return PORT; }
-    static public String getHost() { return HOST; }
 
     public Server() {
         try {
@@ -43,11 +40,7 @@ public class Server extends Thread{
 
     public void sendMessageAll(String msg) {
         for(Connection client : connects) {
-            try {
-                client.send(msg);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            client.send(msg);
         }
     }
 

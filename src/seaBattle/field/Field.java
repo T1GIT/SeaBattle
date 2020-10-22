@@ -1,4 +1,4 @@
-package seaBattle.elements;
+package seaBattle.field;
 
 import java.util.ArrayList;
 
@@ -83,13 +83,13 @@ public class Field {
         return true;
     }
 
-    public boolean isLose() {
+    public boolean isAlive() {
         for (int am : aliveBoats) {
             if (am != 0) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     /**

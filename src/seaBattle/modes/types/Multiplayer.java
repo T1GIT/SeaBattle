@@ -5,12 +5,12 @@ import seaBattle.players.Player;
 import seaBattle.players.types.UI;
 
 public class Multiplayer extends GameMode {
-    public Multiplayer(String userName) { super(userName); }
+//    public Multiplayer(String userName) { super(userName); }
 
     @Override
     public void play() throws UI.input.CommandException {
         UI.print.line();
-        System.out.println("             Welcome to ＭＵＬＴＩＰＬＡＹＥＲ　ＭＯＤＥ, Dear " + players[0].getName() + "! ヽ(・∀・)ﾉ");
+//        System.out.println("             Welcome to ＭＵＬＴＩＰＬＡＹＥＲ　ＭＯＤＥ, Dear " + players[0].getName() + "! ヽ(・∀・)ﾉ");
         UI.print.line();
     }
 

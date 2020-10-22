@@ -1,39 +1,51 @@
-package seaBattle.rooms.types;
+package seaBattle.rooms;
 
 import seaBattle.modes.GameMode;
-import seaBattle.network.server.Connection;
-import seaBattle.rooms.Room;
+import seaBattle.network.Connection;
+import seaBattle.players.Player;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
 public class WebRoom
-        extends Room<Connection>
-        implements Iterator<Connection[]>
+        extends Room
+        implements Iterator<Player[]>
 {
-    private final Connection[] network = new Connection[GameMode.getMaxPlayers()];
+    public final static int MAX_NAME_LENGTH = 30;
     private final String name;
     private byte[] psw;
 
     public String getName() { return name; }
 
-    public WebRoom(String name, Connection connection) {
+    public WebRoom(String name, Player player) {
         this.name = name;
-        network[0] = connection;
+        this.connect(player);
     }
 
-    public WebRoom(String name, Connection connection, String psw) {
-        this(name, connection);
+    public WebRoom(String name, Player player, String psw) {
+        this(name, player);
         this.psw = Security.hash(psw);
     }
 
-    @Override
-    public Connection[] next() {
-        return new Connection[0];
+    public boolean tryConnect(Player player, String inPsw) {
+        if (Security.checkPsw(this.psw, inPsw)) {
+            super.connect(player);
+            return true;
+        } else return false;
+    }
+
+    public String getPrinted() {
+        String lock = Security.isLocked(this) ? "\uD83D\uDD12" : "";
+        return String.format("%2s %-" + MAX_NAME_LENGTH + "s%3d \\ %d",
+                lock,
+                name,
+                getPlayersIn(),
+                getSize());
     }
 
     public static String[] getPrinted(List<WebRoom> roomList) {
@@ -42,8 +54,7 @@ public class WebRoom
         while (iter.hasNext()) {
             int num = iter.nextIndex();
             WebRoom room = iter.next();
-            String lock = WebRoom.Security.isLocked(room) ? "\uD83D\uDD12" : "";
-            res[num] = String.format("%2d %2s %s", num, lock, room.name);
+            res[num] = String.format("%2d %s", num, room.getPrinted());
         }
         return res;
     }
@@ -61,8 +72,6 @@ public class WebRoom
             return null;
         }
 
-        public static boolean checkPsw(WebRoom room, String psw) {
-            return hash(psw) == room.psw;
-        }
+        public static boolean checkPsw(byte[] hashPsw, String psw) { return Arrays.equals(hashPsw, hash(psw)); }
     }
 }

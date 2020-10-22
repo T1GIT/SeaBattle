@@ -1,6 +1,6 @@
 package seaBattle.players.types;
 
-import seaBattle.elements.*;
+import seaBattle.field.*;
 import seaBattle.players.Player;
 
 import java.util.Random;
@@ -110,9 +110,11 @@ public class PC extends Player {
 
         public static Boat boat(Field field) {
             int len = 0;
-            for (int i = Field.MAX_BOAT_LENGTH; i > 0; i--) {
-                if (field.hasInStorage(i)) { len = i; break; };
-            }
+            for (int i = Field.MAX_BOAT_LENGTH; i > 0; i--)
+                if (field.hasInStorage(i)) {
+                    len = i;
+                    break;
+                }
             assert (len != 0) : "Storage is empty";
             while (true) {
                 boolean rotation = rand.bool();
