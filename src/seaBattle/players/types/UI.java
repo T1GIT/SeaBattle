@@ -1,6 +1,7 @@
 package seaBattle.players.types;
 
 import seaBattle.field.*;
+import seaBattle.network.Server;
 import seaBattle.players.Player;
 import seaBattle.rooms.WebRoom;
 
@@ -74,13 +75,17 @@ public class UI extends Player {
     @Override
     public int[] getAction(Player enemy) throws input.CommandException {
         final Field enemyField = enemy.getField();
-        if (autoAction) { return PC.rand.action(enemyField); }
         while (true) {
             try {
                 print.line();
                 print.tableWithEnemy(this, enemy);
                 System.out.println("\n<<< Input coordinates for attack, Your Majesty ... /(≧▽≦)/");
                 System.out.print("X  Y : ");
+                if (autoAction) {
+                    int[] coor = PC.rand.action(enemyField);
+                    System.out.println(coor[0] + " " + coor[1]);
+                    return coor;
+                }
                 int[] args;
                 int x, y;
                 try { args = input.command(); }
@@ -121,8 +126,8 @@ public class UI extends Player {
         public static void tableWithEnemy(Player me, Player enemy) {
             final Field enemyField = enemy.getField();
             String[][] fields = new String[][]{me.getField().getPrinted(me.getName()), enemyField.getPrinted(enemy.getName(), true)};
-            String mar_str = String.valueOf(' ').repeat(MARGIN);
-            int[] storage = me.getField().getAlives();
+            String mar_str = " ".repeat(MARGIN);
+            int[] storage = enemy.getField().getAlives();
             fields[1][STORAGE_SHIFT] += mar_str + "Alive boats:";
             for (int i = 0; i < storage.length; i++) {
                 fields[1][i + 2 + STORAGE_SHIFT] += mar_str + storage[i] + " x " + String.valueOf(Point.getStateSign(1)).repeat(i + 1);
@@ -151,6 +156,19 @@ public class UI extends Player {
             for (String s : field) {
                 System.out.println(mar_str + s);
             }
+        }
+
+        public static void ratingLadder(Player[] rating) {
+            final int WIDTH = Player.MAX_NAME_LENGTH;
+            final int HEIGHT = 2;
+            System.out.println();
+            for (int i = 0; i < rating.length; i++) {
+                int left_margin = (Player.MAX_NAME_LENGTH - rating[i].getName().length()) / 2;
+                System.out.println(" ".repeat(left_margin) + rating[i].getName());
+                System.out.print(" ".repeat(WIDTH * i) + "-".repeat(WIDTH));
+                for (int j = 0; j < HEIGHT; j++) System.out.print("\n" + " ".repeat(WIDTH * (i + 1)) + "|");
+            }
+            System.out.println();
         }
 
         public static void space() {
@@ -183,6 +201,20 @@ public class UI extends Player {
                     System.out.print("Mode: ");
                     int res = input.command()[0];
                     if (res > maxVal || res < 0) {
+                        incorrectInput();
+                    } else {
+                        return res;
+                    }
+                } catch (InputMismatchException e) { incorrectInput(); }
+            }
+        }
+
+        public static int amountOfPlayers() throws CommandException {
+            while (true) {
+                try {
+                    System.out.print("Amount: ");
+                    int res = input.command()[0];
+                    if (res > Server.getFreeConn() || res < 0) {
                         incorrectInput();
                     } else {
                         return res;

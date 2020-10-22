@@ -15,9 +15,11 @@ public class Server extends Thread{
     public static final int PORT = 4444;
     public static final int MAX_CONNECTS = 50;
     public static final int MAX_ROOMS = (MAX_CONNECTS + 1) / 2;
-    private final HashSet<Connection> connects = new HashSet<>(MAX_CONNECTS);
-    private final ArrayList<WebRoom> freeRooms = new ArrayList<>(MAX_ROOMS);
-    private final ArrayList<WebRoom> engagedRooms = new ArrayList<>(MAX_ROOMS);
+    private static final HashSet<Connection> connects = new HashSet<>(MAX_CONNECTS);
+    private static final ArrayList<WebRoom> freeRooms = new ArrayList<>(MAX_ROOMS);
+    private static final ArrayList<WebRoom> engagedRooms = new ArrayList<>(MAX_ROOMS);
+
+    public static int getFreeConn() { return MAX_CONNECTS - connects.size(); }
 
     public Server() {
         try {
@@ -44,10 +46,11 @@ public class Server extends Thread{
         }
     }
 
+//    public
+
 
     public static void main(String[] args) {
         Server server = new Server();
         server.start();
     }
-
 }

@@ -1,6 +1,7 @@
 package seaBattle;
 
 import seaBattle.modes.GameMode;
+import seaBattle.modes.types.Multiplayer;
 import seaBattle.modes.types.Single;
 import seaBattle.players.types.*;
 
@@ -38,11 +39,11 @@ public class SeaBattle {
             int gameMode = UI.input.mode(1);
             GameMode game;
             switch (gameMode) {
-                case 0: game = new Single(userName); break;
-//                case 1: game = new Multiplayer(userName); break;
+                case 0: game = new Single(); break;
+                case 1: game = new Multiplayer(); break;
                 default: throw new IllegalStateException("Unknown game mode " + gameMode);
             }
-            game.play();
+            game.play(userName);
         } catch (UI.input.CommandException e) {
             String[] name = e.getClass().getCanonicalName().split("\\.");
             switch (name[name.length - 1]) {

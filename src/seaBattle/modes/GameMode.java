@@ -4,14 +4,15 @@ import seaBattle.players.Player;
 import seaBattle.players.types.*;
 
 public abstract class GameMode {
-    public static final byte MAX_PLAYERS = 2;
+    public static final byte MAX_PLAYERS = 10;
+    protected String userName;
 
     /**
      * The main body of the game.
      * Starts the game and uses other functions
      * @throws UI.input.CommandException if user typed command
      */
-    public abstract void play() throws UI.input.CommandException ;
+    public abstract void play(String userName) throws UI.input.CommandException ;
 
     /**
      * Is requesting another players for the game until all places will be engaged
@@ -30,8 +31,8 @@ public abstract class GameMode {
 
     /**
      * Is requesting attack and doing it while one player remains
-     * @return name of winner
+     * @return list of {@code Player}s, when index is the place
      * @throws UI.input.CommandException if user typed command
      */
-    public abstract String mainLoop() throws UI.input.CommandException;
+    public abstract Player[] mainLoop() throws UI.input.CommandException;
 }

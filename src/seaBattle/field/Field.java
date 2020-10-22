@@ -84,11 +84,7 @@ public class Field {
     }
 
     public boolean isAlive() {
-        for (int am : aliveBoats) {
-            if (am != 0) {
-                return true;
-            }
-        }
+        for (int am : aliveBoats) if (am != 0) return true;
         return false;
     }
 
@@ -185,11 +181,11 @@ public class Field {
 
     public String[] getPrinted(String name, Boolean hidden) {
         final int LINE_LEN = SIZE * 3;
-        int leftAlign = (LINE_LEN - name.length()) / 2;
-        int rightAlign = LINE_LEN - leftAlign - name.length();
+        int leftAlign = (LINE_LEN + 8 - name.length()) / 2;
+        int rightAlign = LINE_LEN + 8 - leftAlign - name.length();
         final String[] res = new String[SIZE + 6];
         res[0] = "┏ " + "━━ ".repeat(LINE_LEN / 3 + 2) + "━┓";
-        res[1] = "┃" + String.valueOf(' ').repeat(leftAlign + 4) + name + String.valueOf(' ').repeat(rightAlign + 4) + "┃";
+        res[1] = "┃" + String.valueOf(' ').repeat(leftAlign) + name + String.valueOf(' ').repeat(rightAlign) + "┃";
         res[2] = "┣ ━━━ ┳ " + "━━ ".repeat(LINE_LEN / 3) + "━┫";
         StringBuilder numbers = new StringBuilder();
         numbers.append("┃     ┃ ");

@@ -1,26 +1,33 @@
 package seaBattle.rooms;
 
-import seaBattle.modes.GameMode;
 import seaBattle.players.Player;
-import seaBattle.players.types.PC;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.function.Consumer;
 
-public class Room implements Iterator<Player[]> {
-    private final int size = GameMode.MAX_PLAYERS;
-    private final ArrayList<Player> players = new ArrayList<>(size);
+public class Room {
+    private final ArrayList<Player> players;
+    private final int size;
     private int playersIn = 0;
-    private int move = PC.rand.inRange(0, size - 1);
+    private int move;
     private Player attacking;
     private Player defencing;
 
-    public Player getPlayer(int index) { return players.get(index); }
+    public Player getPlayer(int index) {
+        if (index >= players.size()) throw new IndexOutOfBoundsException("Index " + index + " out of room's bounds, " + players.size());
+        return players.get(index);
+    }
+    public Player getNextPlayer(int index) { return players.get((index + 1) % size); }
+    public Player getPrevPlayer(int index) { return players.get((index - 1) % size); }
     public Player getAttacking() { return attacking; }
     public Player getDefencing() { return defencing; }
-    public int getSize() { return size; }
+    public int size() { return size; }
+
+    public Room() { this(2); }
+
+    public Room(int size) {
+        players = new ArrayList<>(size);
+        this.size = size;
+    }
 
     public int getPlayersIn() { return playersIn; }
 
@@ -37,32 +44,22 @@ public class Room implements Iterator<Player[]> {
 
     public boolean isFull() { return !(playersIn < size); }
 
-    @Override
-    public boolean hasNext() { return attacking != defencing; }
-
-    @Override
-    public Player[] next() {
-        for (int i = 0; i < size - 1; i++) {
-            int num = (move + i) % size;
+    public void next() {
+        int i;
+        for (i = move ;i < i + size - 1; i++) {
+            int num = (i) % size;
             if (players.get(num).isAlive()) {
                 this.attacking = players.get(num);
                 break;
             }
         }
-        for (int i = 1; i < size; i++) {
-            int num = (move + i) % size;
+        for (i += 1; i < i + size - 1; i++) {
+            int num = (i) % size;
             if (players.get(num).isAlive()) {
                 this.defencing = players.get(num);
                 break;
             }
         }
         this.move++;
-        return new Player[]{attacking, defencing};
-    }
-
-    @Override
-    public void forEachRemaining(Consumer<? super Player[]> action) {
-        Objects.requireNonNull(action);
-        for (Player player: players) action.accept(new Player[]{player});
     }
 }

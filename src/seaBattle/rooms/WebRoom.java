@@ -1,34 +1,35 @@
 package seaBattle.rooms;
 
-import seaBattle.modes.GameMode;
-import seaBattle.network.Connection;
+import seaBattle.network.Server;
 import seaBattle.players.Player;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class WebRoom
-        extends Room
-        implements Iterator<Player[]>
-{
+public class WebRoom extends Room {
     public final static int MAX_NAME_LENGTH = 30;
     private final String name;
     private byte[] psw;
 
     public String getName() { return name; }
 
-    public WebRoom(String name, Player player) {
+    public WebRoom(String name, Player player) { this(name, player, 2); }
+
+    public WebRoom(String name, Player player, int size) {
+        super(size);
+        assert (size <= Server.getFreeConn()): "Server have no free connections to making room";
         this.name = name;
         this.connect(player);
     }
 
-    public WebRoom(String name, Player player, String psw) {
-        this(name, player);
+    public WebRoom(String name, Player player, String psw) { this(name, player, 2, psw); }
+
+    public WebRoom(String name, Player player, int size, String psw) {
+        this(name, player, size);
         this.psw = Security.hash(psw);
     }
 
@@ -45,7 +46,7 @@ public class WebRoom
                 lock,
                 name,
                 getPlayersIn(),
-                getSize());
+                size());
     }
 
     public static String[] getPrinted(List<WebRoom> roomList) {

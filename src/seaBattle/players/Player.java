@@ -5,7 +5,7 @@ import seaBattle.players.types.UI;
 
 
 public abstract class Player {
-    public final static int MAX_NAME_LENGTH = Field.SIZE + 2;
+    public final static int MAX_NAME_LENGTH = Field.SIZE * 3 + 8;
     protected final Field field;
     private final String name;
 
