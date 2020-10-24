@@ -6,7 +6,13 @@ import seaBattle.players.types.UI;
 
 public abstract class Player {
     public final static int MAX_NAME_LENGTH = Field.SIZE * 3 + 8;
-    protected final static int[] POINTS_FOR_STATE = new int[]{-1, 2, 3};
+    /**
+     * Points for answer from {@code attackMe()} matching index in the array
+     * 0: for passing
+     * 1: for wounding
+     * 2: for killing
+     */
+    protected final static int[] POINTS_FOR_STATE = new int[]{-1, 1, 2};
     protected final Field field;
     private final String name;
     protected int score = 0;
@@ -37,7 +43,10 @@ public abstract class Player {
     /**
      * @return True if player have no alive boat on its field
      */
-    public boolean isAlive() { return this.field.isAlive(); }
+    public boolean isAlive() {
+        this.score++;
+        return this.field.isAlive();
+    }
 
     /**
      * @return True if player isn't {@code PC}

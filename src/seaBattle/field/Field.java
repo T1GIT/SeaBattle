@@ -38,12 +38,8 @@ public class Field {
         this.table = new Point[SIZE][SIZE];
         this.unusedBoats = new int[MAX_BOAT_LENGTH];
         this.aliveBoats = new int[MAX_BOAT_LENGTH];
-        for (int i = 0; i < MAX_BOAT_LENGTH; i++) {
-            this.unusedBoats[i] = MAX_BOAT_LENGTH - i;
-        }
-        for (int i = 0; i < MAX_BOAT_LENGTH; i++) {
-            this.aliveBoats[i] = 0;
-        }
+        for (int i = 0; i < MAX_BOAT_LENGTH; i++) this.unusedBoats[i] = MAX_BOAT_LENGTH - i;
+        for (int i = 0; i < MAX_BOAT_LENGTH; i++) this.aliveBoats[i] = 0;
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
                 this.table[y][x] = new Point();
@@ -58,9 +54,7 @@ public class Field {
         y2 = Math.min(y2 + 1, SIZE - 1);
         for (int _x = x1; _x <= x2; _x++) {
             for (int _y = y1; _y <= y2; _y++) {
-                if (!this.table[_y][_x].isEmpty()) {
-                    return false;
-                }
+                if (!this.table[_y][_x].isEmpty()) return false;
             }
         }
         return true;
@@ -75,11 +69,7 @@ public class Field {
     }
 
     public boolean isStorageEmpty() {
-        for (int am : unusedBoats) {
-            if (am != 0) {
-                return false;
-            }
-        }
+        for (int am : unusedBoats) if (am != 0) return false;
         return true;
     }
 
@@ -106,17 +96,11 @@ public class Field {
             p.wound();
             Boat boat = p.getBoat();
             if (boat.isDead()) {
-                for (Point point : this.getBoatPoints(boat)) {
-                    point.kill();
-                }
-                for (Point point : this.getEnv(boat)) {
-                    point.pass();
-                }
+                for (Point point : this.getBoatPoints(boat)) point.kill();
+                for (Point point : this.getEnv(boat)) point.pass();
                 --aliveBoats[boat.length() - 1];
                 state = 2;
-            } else {
-                state = 1;
-            }
+            } else state = 1;
         }
         return state;
     }
@@ -200,9 +184,7 @@ public class Field {
             str.append("┃  ").append(row).append("  ┃ ");
             for (int col = 0; col < SIZE; col++) {
                 char symbol = table[row][col].draw();
-                if (table[row][col].isAlive() && hidden) {
-                    symbol = Point.getStateSign(0);
-                }
+                if (table[row][col].isAlive() && hidden) symbol = Point.getStateSign(0);
                 str.append(" ").append(symbol).append(" ");
             }
             str.append(" ┃");

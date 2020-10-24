@@ -37,24 +37,21 @@ public class SeaBattle {
                     "    1 - Multiplayer (Play with gamers around the world)\n" +
                     ">>> Make your choice ヽ(o^―^o)ﾉ");
             int gameMode = UI.input.mode(1);
-            GameMode game;
-            switch (gameMode) {
-                case 0: game = new Single(); break;
-                case 1: game = new Multiplayer(); break;
-                default: throw new IllegalStateException("Unknown game mode " + gameMode);
-            }
+            GameMode game = switch (gameMode) {
+                case 0 -> new Single();
+                case 1 -> new Multiplayer();
+                default -> throw new IllegalStateException("Unknown game mode " + gameMode);
+            };
             game.play(userName);
         } catch (UI.input.CommandException e) {
             String[] name = e.getClass().getCanonicalName().split("\\.");
             switch (name[name.length - 1]) {
-                case "Exit":
-                    System.exit(69);
-                    break;
-                case "Reset":
+                case "Exit" -> System.exit(69);
+                case "Reset" -> {
                     UI.print.space();
                     start();
-                default:
-                    e.printStackTrace();
+                }
+                default -> e.printStackTrace();
             }
         }
     }

@@ -68,7 +68,7 @@ public class Single extends GameMode {
 //                "    █████████▄░░░└┴┴┴┴┴┴┴┘░░░▄█████████\n" +
 //                "    ███████████▄░░░░░░░░░░░▄███████████\n" +
 //                "    ██████████████▄▄▄▄▄▄▄██████████████\n");
-        UI.print.ratingLadder(rating);
+        UI.print.rating.table(rating);
         System.out.print("What do you want to do next? ... ");
         UI.input.command();
     }
@@ -83,16 +83,16 @@ public class Single extends GameMode {
         int gameMode = UI.input.mode(1);
         UI.print.line();
         switch (gameMode) {
-            case 0:
+            case 0 -> {
                 System.out.println("Wow, good choice, our Terminator is already ready to win this game (⌐■_■)>");
                 player = new PC();
-                break;
-            case 1:
+            }
+            case 1 -> {
                 System.out.println("Oh, it's incredible, so many people in there (O.O)\n" +
                         ">>> What's your name, Stranger?");
                 player = new UI(UI.input.playerName());
-                break;
-            default: throw new IllegalStateException("Unexpected value: " + gameMode);
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + gameMode);
         }
         return player;
     }

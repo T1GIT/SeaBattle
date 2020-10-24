@@ -37,28 +37,31 @@ public class UI extends Player {
                 }
                 int[] args;
                 int x1, y1, x2, y2;
-                try { args = input.command(); }
+                try { args = input.command(4); }
                 catch (input.CommandException.RandomBoat e) {  return PC.rand.boat(this.field); }
                 catch (input.CommandException.RandomField e) {
                     this.autoBoat = true;
                     return PC.rand.boat(this.field);
                 }
                 switch (args.length) {
-                    case 1:
+                    case 1 -> {
                         int num = args[0];
-                        x1 = num / 1000; y1 = num / 100 % 10;
-                        x2 = num / 10 % 10; y2 = num % 10;
-                        break;
-                    case 2:
+                        x1 = num / 1000;
+                        y1 = num / 100 % 10;
+                        x2 = num / 10 % 10;
+                        y2 = num % 10;
+                    }
+                    case 2 -> {
                         x1 = x2 = args[0];
                         y1 = y2 = args[1];
-                        break;
-                    case 4:
-                        x1 = args[0]; y1 = args[1];
-                        x2 = args[2]; y2 = args[3];
-                        break;
-                    default:
-                        throw new InputMismatchException();
+                    }
+                    case 4 -> {
+                        x1 = args[0];
+                        y1 = args[1];
+                        x2 = args[2];
+                        y2 = args[3];
+                    }
+                    default -> throw new InputMismatchException();
                 }
                 if (Field.isOver(x1, y1) || Field.isOver(x2, y2)) {
                     System.out.println("I am sorry, but boat's coordinates isn't inbound (μ_μ)");
@@ -93,7 +96,7 @@ public class UI extends Player {
                 }
                 int[] args;
                 int x, y;
-                try { args = input.command(); }
+                try { args = input.command(2); }
                 catch (input.CommandException.RandomBoat e) {  return PC.rand.action(enemyField); }
                 catch (input.CommandException.RandomField e) {
                     this.autoAction = true;
@@ -116,10 +119,10 @@ public class UI extends Player {
     @Override
     public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed
         switch (code) {
-            case 0: System.out.println("This place is empty (ﾉ>_<)ﾉ"); break;
-            case 1: System.out.println("Wow, it was an accurate shot, Sir  w (ﾟｏﾟ)w"); break;
-            case 2: System.out.println("Another one kill, congratulations (￣^￣)ゞ"); break;
-            default: throw new IllegalStateException("Unexpected answer code: " + code);
+            case 0 -> System.out.println("This place is empty (ﾉ>_<)ﾉ");
+            case 1 -> System.out.println("Wow, it was an accurate shot, Sir  w (ﾟｏﾟ)w");
+            case 2 -> System.out.println("Another one kill, congratulations (￣^￣)ゞ");
+            default -> throw new IllegalStateException("Unexpected answer code: " + code);
         }
         score += POINTS_FOR_STATE[code];
     }
@@ -160,37 +163,7 @@ public class UI extends Player {
         public static void table(Player me) {
             String[] field = me.getField().getPrinted(me.getName());
             String mar_str = String.valueOf(' ').repeat(MARGIN);
-            for (String s : field) {
-                System.out.println(mar_str + s);
-            }
-        }
-
-        public static void ratingLadder(Object[][] rating) {
-            final int WIDTH = Player.MAX_NAME_LENGTH;
-            final int HEIGHT = 2;
-            String name; int score, left_margin;
-            System.out.println();
-            for (int i = 0; i < rating.length; i++) {
-                name = (String) rating[i][0];
-                score = (int) rating[i][1];
-                left_margin = (Player.MAX_NAME_LENGTH - name.length()) / 2;
-                System.out.println(" ".repeat(left_margin) + name);
-                System.out.print(" ".repeat(WIDTH * i) + "-".repeat(WIDTH));
-                System.out.printf("\n" + " ".repeat(WIDTH * (i)) + "%-" + WIDTH + "d" + "|", score);
-                for (int j = 0; j < HEIGHT - 1; j++) System.out.print("\n" + " ".repeat(WIDTH * (i + 1)) + "|");
-            }
-            System.out.println();
-        }
-
-        public static void ratingTable(String[] rating) {
-//            System.out.println();
-//            String margin = " ".repeat((Player.MAX_NAME_LENGTH) / 2);
-//            System.out.println("PLACE" + margin + "NAME" + margin + "POINTS");
-//            int place, points; String name;
-//            for (int i = 0, place = 1; i < rating.length; i++, place++) {
-//                p
-//            }
-//            System.out.println();
+            for (String s : field) System.out.println(mar_str + s);
         }
 
         public static void space() {
@@ -201,6 +174,39 @@ public class UI extends Player {
         public static void line() {
             final int LEN = 130;
             System.out.println("⎯".repeat(LEN));
+        }
+
+        public static class rating {
+            public static void ladder(Object[][] rating) {
+                final int WIDTH = Player.MAX_NAME_LENGTH;
+                final int HEIGHT = 2;
+                String name; int score, left_margin;
+                System.out.println();
+                for (int i = 0; i < rating.length; i++) {
+                    name = (String) rating[i][0];
+                    score = (int) rating[i][1];
+                    left_margin = (Player.MAX_NAME_LENGTH - name.length()) / 2;
+                    System.out.println(" ".repeat(left_margin) + name);
+                    System.out.print(" ".repeat(WIDTH * i) + "-".repeat(WIDTH));
+                    System.out.printf("\n" + " ".repeat(WIDTH * (i)) + "%-" + WIDTH + "d" + "|", score);
+                    for (int j = 0; j < HEIGHT - 1; j++) System.out.print("\n" + " ".repeat(WIDTH * (i + 1)) + "|");
+                }
+                System.out.println();
+            }
+
+            public static void table(Object[][] rating) {
+                System.out.println();
+                int margin = (Player.MAX_NAME_LENGTH) / 2;
+                System.out.println("PLACE" + " ".repeat(margin) + "NAME" + " ".repeat(margin) + "POINTS");
+                int points; String name;
+                for (int i = 0, place = 1; i < rating.length; i++, place++) {
+                    name = (String) rating[i][0];
+                    points = (int) rating[i][1];
+                    System.out.printf("%5d  %-" + (Player.MAX_NAME_LENGTH) + "s  %-6d\n",
+                            place, name, points);
+                }
+                System.out.println();
+            }
         }
     }
 
@@ -221,12 +227,9 @@ public class UI extends Player {
             while (true) {
                 try {
                     System.out.print("Mode: ");
-                    int res = input.command()[0];
-                    if (res > maxVal || res < 0) {
-                        incorrectInput();
-                    } else {
-                        return res;
-                    }
+                    int res = input.command(1)[0];
+                    if (res > maxVal || res < 0) incorrectInput();
+                    else return res;
                 } catch (InputMismatchException e) { incorrectInput(); }
             }
         }
@@ -235,12 +238,9 @@ public class UI extends Player {
             while (true) {
                 try {
                     System.out.print("Amount: ");
-                    int res = input.command()[0];
-                    if (res > Server.getFreeConn() || res < 0) {
-                        incorrectInput();
-                    } else {
-                        return res;
-                    }
+                    int res = input.command(1)[0];
+                    if (res > Server.getFreeConn() || res < 2) incorrectInput();
+                    else return res;
                 } catch (InputMismatchException e) { incorrectInput(); }
             }
         }
@@ -252,9 +252,7 @@ public class UI extends Player {
                 if (res.length() > WebRoom.MAX_NAME_LENGTH) {
                     System.out.println("          Unfortunately, this name is too long (maximum length is " + WebRoom.MAX_NAME_LENGTH + " symbols)");
                     print.line();
-                } else {
-                    return res;
-                }
+                } else return res;
             }
         }
 
@@ -265,25 +263,29 @@ public class UI extends Player {
                 if (res.length() > Player.MAX_NAME_LENGTH) {
                     System.out.println("          Unfortunately, this name is too long (maximum length is " + Player.MAX_NAME_LENGTH + " symbols)");
                     print.line();
-                } else {
-                    return res;
-                }
+                } else return res;
             }
         }
 
-        public static int[] command() throws InputMismatchException, CommandException {
-            String[] cmd = new Scanner(System.in).nextLine().toLowerCase().strip().split("\\s+");
-            switch (cmd[0]) {
-                case "reset": throw new CommandException.Reset();
-                case "exit": throw new CommandException.Exit();
-                case "r": throw new CommandException.RandomBoat();
-                case "random": throw new CommandException.RandomField();
-                case "chat": throw new CommandException.Chat(String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length)));
-                default: {
-                    int[] res = new int[cmd.length];
-                    try { for (int i = 0; i < cmd.length; i++) res[i] = Integer.parseInt(cmd[i]); }
-                    catch (NumberFormatException e) { throw new InputMismatchException(); }
-                    return res;
+        public static void command() throws CommandException { command(0); }
+
+        public static int[] command(int argsAmount) throws CommandException, InputMismatchException {
+            while (true) {
+                String[] cmd = new Scanner(System.in).nextLine().toLowerCase().strip().split("\\s+");
+                switch (cmd[0]) {
+                    case "reset" -> throw new CommandException.Reset();
+                    case "exit" -> throw new CommandException.Exit();
+                    case "r" -> throw new CommandException.RandomBoat();
+                    case "random" -> throw new CommandException.RandomField();
+                    case "chat" -> throw new CommandException.Chat(String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length)));
+                    default -> {
+                        if (cmd.length != argsAmount) throw new InputMismatchException();
+                        int[] args = new int[argsAmount];
+                        try {
+                            for (int i = 0; i < argsAmount; i++) args[i] = Integer.parseInt(cmd[i]);
+                        } catch (NumberFormatException e) { throw new InputMismatchException(); }
+                        return args;
+                    }
                 }
             }
         }

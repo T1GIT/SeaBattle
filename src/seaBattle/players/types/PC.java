@@ -28,7 +28,7 @@ public class PC extends Player {
             int x = this.lastWoundCoor[0]; int y = this.lastWoundCoor[1];
             if (woundedBoat.getWounds() > 1) {  // Have >= 2 wounded points of boat
                 Point point;
-                int direction = 0;
+                int direction;
                 try {
                     direction = findWoundDirection(enemyField);
                 } catch (AssertionError assertionError) {
@@ -55,13 +55,13 @@ public class PC extends Player {
                 }
             } else {  // Have only 1 wounded point
                 while (true) {
-                    switch (rand.inRange(0, 3)) {
-                        case 0: coor = new int[]{x, y + 1}; break;
-                        case 1: coor = new int[]{x + 1, y}; break;
-                        case 2: coor = new int[]{x, y - 1}; break;
-                        case 3: coor = new int[]{x - 1, y}; break;
-                        default: coor = new int[]{x, y};
-                    }
+                    coor = switch (rand.inRange(0, 3)) {
+                        case 0 -> new int[]{x, y + 1};
+                        case 1 -> new int[]{x + 1, y};
+                        case 2 -> new int[]{x, y - 1};
+                        case 3 -> new int[]{x - 1, y};
+                        default -> new int[]{x, y};
+                    };
                     if (Field.isOver(coor[0], coor[1])) continue;
                     if (enemyField.getPoint(coor).isAttackable()) {break;}
                 }
@@ -76,9 +76,12 @@ public class PC extends Player {
     @Override
     public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed
         switch (code) {
-            case 1: lastWounded = true; lastWoundCoor = lastHitCoor; break;
-            case 0: case 2: lastWounded = false; break;
-            default: throw new IllegalStateException("Unexpected answer code: " + code);
+            case 1 -> {
+                lastWounded = true;
+                lastWoundCoor = lastHitCoor;
+            }
+            case 0, 2 -> lastWounded = false;
+            default -> throw new IllegalStateException("Unexpected answer code: " + code);
         }
         score += POINTS_FOR_STATE[code];
     }
