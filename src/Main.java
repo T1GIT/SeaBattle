@@ -1,5 +1,5 @@
 import seaBattle.SeaBattle;
-import seaBattle.network.Client;
+
 
 public class Main {
 

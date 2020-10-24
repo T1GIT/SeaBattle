@@ -25,7 +25,7 @@ public class Multiplayer extends GameMode {
     }
 
     @Override
-    public Player[] mainLoop() throws UI.input.CommandException {
+    public Object[][] mainLoop() throws UI.input.CommandException {
         return null;
     }
 }

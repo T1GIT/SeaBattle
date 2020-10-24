@@ -31,8 +31,8 @@ public abstract class GameMode {
 
     /**
      * Is requesting attack and doing it while one player remains
-     * @return list of {@code Player}s, when index is the place
+     * @return list of players' names, where index is the place
      * @throws UI.input.CommandException if user typed command
      */
-    public abstract Player[] mainLoop() throws UI.input.CommandException;
+    public abstract Object[][] mainLoop() throws UI.input.CommandException;
 }

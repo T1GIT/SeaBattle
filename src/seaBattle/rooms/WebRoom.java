@@ -26,14 +26,14 @@ public class WebRoom extends Room {
         this.connect(player);
     }
 
-    public WebRoom(String name, Player player, String psw) { this(name, player, 2, psw); }
+    public WebRoom(String name, Player player, byte[] psw) { this(name, player, 2, psw); }
 
-    public WebRoom(String name, Player player, int size, String psw) {
+    public WebRoom(String name, Player player, int size, byte[] psw) {
         this(name, player, size);
-        this.psw = Security.hash(psw);
+        this.psw = psw;
     }
 
-    public boolean tryConnect(Player player, String inPsw) {
+    public boolean tryConnect(Player player, byte[] inPsw) {
         if (Security.checkPsw(this.psw, inPsw)) {
             super.connect(player);
             return true;
@@ -60,7 +60,7 @@ public class WebRoom extends Room {
         return res;
     }
 
-    private static class Security {
+    public static class Security {
         public static boolean isLocked(WebRoom room) { return room.psw != null; }
 
         public static byte[] hash(String str) {
@@ -73,6 +73,6 @@ public class WebRoom extends Room {
             return null;
         }
 
-        public static boolean checkPsw(byte[] hashPsw, String psw) { return Arrays.equals(hashPsw, hash(psw)); }
+        public static boolean checkPsw(byte[] hashPsw, byte[] inPsw) { return Arrays.equals(hashPsw, inPsw); }
     }
 }

@@ -5,7 +5,6 @@ import seaBattle.network.Server;
 import seaBattle.players.Player;
 import seaBattle.rooms.WebRoom;
 
-import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -23,13 +22,19 @@ public class UI extends Player {
 
     @Override
     public Boat getBoat() throws input.CommandException {
-        if (autoBoat) { return PC.rand.boat(this.field); }
         while (true) {
             try {
                 print.line();
                 print.tableWithStorage(this);
                 System.out.println("\n<<< Input coordinates of your new boat, Your Majesty ... ╰(*´︶`*)╯♡    (r - for random boat, random - for autofilling)");
                 System.out.print("X₁  Y₁  X₂  Y₂ : ");
+                if (autoBoat) {
+                    Boat boat = PC.rand.boat(this.field);
+                    byte [] xDist = boat.getxPos();
+                    byte [] yDist = boat.getyPos();
+                    System.out.println(xDist[0] + " " + yDist[0] + " " + xDist[1] + " " + yDist[1]);
+                    return boat;
+                }
                 int[] args;
                 int x1, y1, x2, y2;
                 try { args = input.command(); }
@@ -109,12 +114,14 @@ public class UI extends Player {
     }
 
     @Override
-    public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed; 3 - impossible
+    public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed
         switch (code) {
-            case 0: { if (!autoAction) System.out.println("This place is empty (ﾉ>_<)ﾉ"); break; }
-            case 1: { if (!autoAction)  System.out.println("Wow, it was an accurate shot, Sir  w (ﾟｏﾟ)w"); break; }
-            case 2: { if (!autoAction)  System.out.println("Another one kill, congratulations (￣^￣)ゞ"); break; }
+            case 0: System.out.println("This place is empty (ﾉ>_<)ﾉ"); break;
+            case 1: System.out.println("Wow, it was an accurate shot, Sir  w (ﾟｏﾟ)w"); break;
+            case 2: System.out.println("Another one kill, congratulations (￣^￣)ゞ"); break;
+            default: throw new IllegalStateException("Unexpected answer code: " + code);
         }
+        score += POINTS_FOR_STATE[code];
     }
 
     private static void incorrectInput() { System.out.println("<<< Sorry, but your slave cannot understand you  (╥﹏╥)"); }
@@ -158,17 +165,32 @@ public class UI extends Player {
             }
         }
 
-        public static void ratingLadder(Player[] rating) {
+        public static void ratingLadder(Object[][] rating) {
             final int WIDTH = Player.MAX_NAME_LENGTH;
             final int HEIGHT = 2;
+            String name; int score, left_margin;
             System.out.println();
             for (int i = 0; i < rating.length; i++) {
-                int left_margin = (Player.MAX_NAME_LENGTH - rating[i].getName().length()) / 2;
-                System.out.println(" ".repeat(left_margin) + rating[i].getName());
+                name = (String) rating[i][0];
+                score = (int) rating[i][1];
+                left_margin = (Player.MAX_NAME_LENGTH - name.length()) / 2;
+                System.out.println(" ".repeat(left_margin) + name);
                 System.out.print(" ".repeat(WIDTH * i) + "-".repeat(WIDTH));
-                for (int j = 0; j < HEIGHT; j++) System.out.print("\n" + " ".repeat(WIDTH * (i + 1)) + "|");
+                System.out.printf("\n" + " ".repeat(WIDTH * (i)) + "%-" + WIDTH + "d" + "|", score);
+                for (int j = 0; j < HEIGHT - 1; j++) System.out.print("\n" + " ".repeat(WIDTH * (i + 1)) + "|");
             }
             System.out.println();
+        }
+
+        public static void ratingTable(String[] rating) {
+//            System.out.println();
+//            String margin = " ".repeat((Player.MAX_NAME_LENGTH) / 2);
+//            System.out.println("PLACE" + margin + "NAME" + margin + "POINTS");
+//            int place, points; String name;
+//            for (int i = 0, place = 1; i < rating.length; i++, place++) {
+//                p
+//            }
+//            System.out.println();
         }
 
         public static void space() {

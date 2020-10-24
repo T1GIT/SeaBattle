@@ -5,6 +5,7 @@ import seaBattle.players.Player;
 
 import java.util.Random;
 
+
 public class PC extends Player {
     private boolean lastWounded = false;
     private int[] lastWoundCoor;
@@ -27,7 +28,13 @@ public class PC extends Player {
             int x = this.lastWoundCoor[0]; int y = this.lastWoundCoor[1];
             if (woundedBoat.getWounds() > 1) {  // Have >= 2 wounded points of boat
                 Point point;
-                int direction = findWoundDirection(enemyField);
+                int direction = 0;
+                try {
+                    direction = findWoundDirection(enemyField);
+                } catch (AssertionError assertionError) {
+                    this.lastWounded = false;
+                    return getAction(enemy);
+                }
                 boolean hor_axis = direction % 2 == 0;
                 int step = - direction + (hor_axis ? 1 : 2);
                 while (true){
@@ -67,20 +74,22 @@ public class PC extends Player {
     }
 
     @Override
-    public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed; 3 - impossible
+    public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed
         switch (code) {
-            case 1: { lastWounded = true; lastWoundCoor = lastHitCoor; break;}
-            case 2: { lastWounded = false; break;}
+            case 1: lastWounded = true; lastWoundCoor = lastHitCoor; break;
+            case 0: case 2: lastWounded = false; break;
+            default: throw new IllegalStateException("Unexpected answer code: " + code);
         }
+        score += POINTS_FOR_STATE[code];
     }
 
-    private int findWoundDirection(Field field) {
+    private int findWoundDirection(Field field) throws AssertionError {
         int x = this.lastWoundCoor[0]; int y = this.lastWoundCoor[1];
         if (Field.inBounds(y+1) && field.getPoint(x, y+1).isWounded()) { return 0; }  // Up
         else if (Field.inBounds(x+1) && field.getPoint(x+1, y).isWounded()) { return 1; }  // Right
         else if (Field.inBounds(y-1) && field.getPoint(x, y-1).isWounded()) { return 2; }  // Down
         else if (Field.inBounds(x-1) && field.getPoint(x-1, y).isWounded()) { return 3; }  // Left
-        else { throw new AssertionError("It isn't wounded points around"); }
+        else {throw new AssertionError("It isn't wounded points around"); }
     }
 
     public static class rand {

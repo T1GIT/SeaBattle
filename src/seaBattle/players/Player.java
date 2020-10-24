@@ -6,11 +6,14 @@ import seaBattle.players.types.UI;
 
 public abstract class Player {
     public final static int MAX_NAME_LENGTH = Field.SIZE * 3 + 8;
+    protected final static int[] POINTS_FOR_STATE = new int[]{-1, 2, 3};
     protected final Field field;
     private final String name;
+    protected int score = 0;
 
     public Field getField() { return this.field; }
     public String getName() { return this.name; }
+    public int getScore() { return this.score; }
 
     /**
      * Constructs Player
@@ -57,6 +60,9 @@ public abstract class Player {
     /**
      * Returns answer to player
      * @param code of answer from {@code field.attack()}
+     *      0 - passed
+     *      1 - wounded
+     *      2 - killed
      */
     public abstract void retAnswer(int code);
 

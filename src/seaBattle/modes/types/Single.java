@@ -8,7 +8,6 @@ import seaBattle.players.types.UI;
 import seaBattle.rooms.Room;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 public class Single extends GameMode {
@@ -41,7 +40,7 @@ public class Single extends GameMode {
         }
         System.out.println("\n\n              \uD835\uDD43\uD835\uDD56\uD835\uDD65❜\uD835\uDD64 \uD835\uDD64\uD835\uDD65\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD63\uD835\uDD65!  ►\n\n");
         UI.print.space();
-        Player[] rating = mainLoop();
+        Object[][] rating = mainLoop();
 //        String winnerName = order[order.length - 1].getName();
 //        String repName = winnerName.repeat(50) + "\n";
 //        System.out.println("\n\n" +
@@ -114,8 +113,8 @@ public class Single extends GameMode {
     }
 
     @Override
-    public Player[] mainLoop() throws UI.input.CommandException {
-        ArrayList<Player> result = new ArrayList<>(room.size());
+    public Object[][] mainLoop() throws UI.input.CommandException {
+        ArrayList<Object[]> result = new ArrayList<>(room.size());
         Player attacking;
         Player defencing;
         room.start();
@@ -126,15 +125,15 @@ public class Single extends GameMode {
             int answer = defencing.attackMe(action);
             attacking.retAnswer(answer);
             if (!defencing.isAlive()) {
-                result.add(defencing);
+                result.add(new Object[]{defencing.getName(), defencing.getScore()});
                 room.next();
             } else if (answer == 0) {
                 room.next();
                 if (defencing.isHuman()) UI.print.space();
             }
         } while (result.size() < room.size() - 1);
-        result.add(attacking);
+        result.add(new Object[]{attacking.getName(), defencing.getScore()});
         Collections.reverse(result);
-        return result.toArray(Player[]::new);
+        return result.toArray(Object[][]::new);
     }
 }
