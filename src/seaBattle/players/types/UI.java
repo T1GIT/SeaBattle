@@ -234,15 +234,19 @@ public class UI extends Player {
             }
         }
 
-        public static int amountOfPlayers() throws CommandException {
+        public static int amountOfPlayers(int maxPlayers) throws CommandException {
             while (true) {
                 try {
                     System.out.print("Amount: ");
                     int res = input.command(1)[0];
-                    if (res > Server.getFreeConn() || res < 2) incorrectInput();
+                    if (res > maxPlayers || res < 2) incorrectInput();
                     else return res;
                 } catch (InputMismatchException e) { incorrectInput(); }
             }
+        }
+
+        public static int amountOfPlayers() throws CommandException {
+            return amountOfPlayers(1000);
         }
 
         public static String roomName() {
