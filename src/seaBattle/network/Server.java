@@ -20,15 +20,8 @@ public class Server extends Thread{
     public static final HashMap<String, WebRoom> engagedRooms = new HashMap<>(MAX_ROOMS);
 
     public Server() {
-        Server.freeRooms.put("Dima" ,new WebRoom(null, 2));
-        Server.freeRooms.put("seffffddd", new WebRoom(null, 2, WebRoom.security.hash("1234")));
-        Server.freeRooms.put("Difaeefasema" ,new WebRoom(null, 2));
-        Server.freeRooms.put("Dffsafsdfima" ,new WebRoom(null, 2));
-        Server.freeRooms.put("Ddfasdfiasfdsfafma" ,new WebRoom(null, 2));
-        Server.freeRooms.put("fiejef", new WebRoom(null, 2, WebRoom.security.hash("1111")));
-        Server.freeRooms.put("afsadfadfDsdfasdfima" ,new WebRoom(null, 2));
-        Server.freeRooms.put("adfasdfsdfDadfima" ,new WebRoom(null, 2));
-        Server.freeRooms.put("tt4tt", new WebRoom(null, 2, WebRoom.security.hash("0000")));
+        Server.freeRooms.put("test1" ,new WebRoom(null, 2));
+        Server.freeRooms.put("test2", new WebRoom(null, 5, WebRoom.security.hash("0000")));
         try {
             InetAddress addr = InetAddress.getByName(HOST);
             serverSocket = new ServerSocket(PORT, MAX_CONNECTS, addr);

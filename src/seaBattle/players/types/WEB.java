@@ -10,7 +10,8 @@ import java.io.IOException;
 
 public class WEB extends Player {
     private final Connection conn;
-//    private final WebRoom room;
+
+    public Connection getConn() { return conn; }
 
     public WEB(String name, Connection connection) {
         super(name);

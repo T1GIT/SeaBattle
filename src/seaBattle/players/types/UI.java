@@ -276,7 +276,10 @@ public class UI extends Player {
             }
         }
 
-        public static byte[] password() { return WebRoom.security.hash(new Scanner(System.in).nextLine()); }
+        public static byte[] password() {
+            System.out.print("Password: ");
+            return WebRoom.security.hash(new Scanner(System.in).nextLine());
+        }
 
         public static void command() throws CommandException { command(0); }
 

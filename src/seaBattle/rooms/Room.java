@@ -8,7 +8,6 @@ public class Room {
     public final static int MAX_PLAYERS = 10000;
     private final ArrayList<Player> players;
     private final int size;
-    private int playersIn = 0;
     private int move;
     private Player attacking;
     private Player defencing;
@@ -23,27 +22,19 @@ public class Room {
     public Player getDefencing() { return defencing; }
     public int size() { return size; }
 
-    public Room() { this(2); }
-
     public Room(int size) {
         if (size > MAX_PLAYERS) throw new AssertionError("Max amount of players is " + MAX_PLAYERS + ", but " + size + " given");
         players = new ArrayList<>(size);
         this.size = size;
     }
 
-    public int getPlayersIn() { return playersIn; }
+    public int getPlayersIn() { return players.size(); }
 
-    public void connect(Player player) {
-        players.add(player);
-        playersIn++;
-    }
+    public void connect(Player player) { players.add(player); }
 
-    public void start() {
-        assert (isFull()) : "Room " + this.toString() + " has " + playersIn + " out of " + size;
-        next();
-    }
+    public void start() { next(); }
 
-    public boolean isFull() { return !(playersIn < size); }
+    public boolean isFull() { return getPlayersIn() == size; }
 
     public void next() {
         int i;

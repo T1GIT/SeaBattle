@@ -19,7 +19,7 @@ public class Connection
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
     private Player player;
-
+    private WebRoom room;
 
     public Player getPlayer() { return player; }
 
@@ -79,6 +79,8 @@ public class Connection
             if (room == null || room.isFull()) send(0);
             else if (!room.checkPsw((byte[]) answer[1])) send(1);
             else {
+                room.connect(this.player);
+                this.room = room;
                 send(2);
                 break;
             }
@@ -105,10 +107,17 @@ public class Connection
             case 1 -> createRoom(false);
             case 2 -> createRoom(true);
         }
+        findPlayer();
     }
 
     @Override
     public Player findPlayer() throws UI.input.CommandException {
+        for (int i = 0; i < room.getPlayersIn(); i++) {
+            room.getConn(i).send(
+                    player.getName(),
+                    "connected",
+                    room.size() - room.getPlayersIn());
+        }
         return null;
     }
 

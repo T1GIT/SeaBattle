@@ -60,14 +60,15 @@ public class Multiplayer
 
     @Override
     public Player findPlayer() throws UI.input.CommandException {
-        System.out.println("Lets wait for the other players...");
+        UI.print.line();
+        System.out.println("Let's wait for the other players...");
         Object[] data;
         do {
             data = client.receiveArray();
             System.out.printf("Player %s %s, %s free places last in the room\n",
-                    data[0],
-                    data[1],
-                    data[2]
+                    data[0], //     name (String)
+                    data[1], //     connected/disconnected (String)
+                    data[2] //      empty places (int)
             );
             if (data[2].equals(0)) return null;
         } while (!data[2].equals(0));
@@ -90,17 +91,22 @@ public class Multiplayer
         HashMap<String, Object[]> rooms = (HashMap<String, Object[]>) client.receive();
         WebRoom.print(rooms);
         while (true) {
-            System.out.println(">>> Type the name of the room to connect");
+            System.out.println("\n>>> Type the name of the room to connect");
             String roomName = UI.input.roomName();
             if (!rooms.containsKey(roomName)) System.out.println("No one room with name " + roomName);
             else {
                 label: while (true) {
                     if ((boolean) rooms.get(roomName)[0]) client.send(roomName, UI.input.password());
                     else client.send(roomName);
-                    switch ((int) client.receive()) {
-                        case 0 -> System.out.println("Sorry, but this room is inaccessible (>_<)");
-                        case 1 -> System.out.println("Incorrect password. Please, try again. I'm sure, you can do that ( ￣▽￣)");
-                        case 2 -> { break label; }
+                    switch (( int ) client.receive()) {
+                        case 0:
+                            System.out.println("Sorry, but this room is inaccessible (>_<)");
+                            break label;
+                        case 1:
+                            System.out.println("Incorrect password. Please, try again. I'm sure, you can do that ( ￣▽￣)");
+                            break;
+                        case 2:
+                            break label;
                     }
                 }
                 break;

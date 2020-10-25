@@ -1,6 +1,8 @@
 package seaBattle.rooms;
 
+import seaBattle.network.Connection;
 import seaBattle.players.Player;
+import seaBattle.players.types.WEB;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -20,6 +22,8 @@ public class WebRoom extends Room {
         this(player, size);
         this.psw = psw;
     }
+
+    public Connection getConn(int index) { return ((WEB) this.getPlayer(index)).getConn(); }
 
     public boolean isLocked() { return this.psw != null; }
 
