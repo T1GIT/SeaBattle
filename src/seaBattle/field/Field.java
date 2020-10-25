@@ -13,15 +13,12 @@ public class Field {
     public Point getPoint(int[] coor) {
         return table[coor[1]][coor[0]];
     }
-
     public Point getPoint(int x, int y) {
         return table[y][x];
     }
-
     public int[] getStorage() {
         return unusedBoats;
     }
-
     public int[] getAlives() {
         return aliveBoats;
     }
@@ -29,7 +26,6 @@ public class Field {
     public static boolean inBounds(int coor) {
         return coor >= 0 && coor < SIZE;
     }
-
     public static boolean isOver(int x, int y) {
         return !inBounds(x) || !inBounds(y);
     }
@@ -96,13 +92,21 @@ public class Field {
             p.wound();
             Boat boat = p.getBoat();
             if (boat.isDead()) {
-                for (Point point : this.getBoatPoints(boat)) point.kill();
-                for (Point point : this.getEnv(boat)) point.pass();
-                --aliveBoats[boat.length() - 1];
+                killBoat(boat);
                 state = 2;
             } else state = 1;
         }
         return state;
+    }
+
+    /**
+     * Records killing of the boat to {@code Field} memory
+     * @param boat to kill
+     */
+    public void killBoat(Boat boat) {
+        for (Point point : this.getBoatPoints(boat)) point.kill();
+        for (Point point : this.getEnv(boat)) point.pass();
+        --aliveBoats[boat.length() - 1];
     }
 
     /**

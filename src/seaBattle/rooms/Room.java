@@ -5,6 +5,7 @@ import seaBattle.players.Player;
 import java.util.ArrayList;
 
 public class Room {
+    public final static int MAX_PLAYERS = 10000;
     private final ArrayList<Player> players;
     private final int size;
     private int playersIn = 0;
@@ -25,6 +26,7 @@ public class Room {
     public Room() { this(2); }
 
     public Room(int size) {
+        if (size > MAX_PLAYERS) throw new AssertionError("Max amount of players is " + MAX_PLAYERS + ", but " + size + " given");
         players = new ArrayList<>(size);
         this.size = size;
     }
@@ -32,7 +34,6 @@ public class Room {
     public int getPlayersIn() { return playersIn; }
 
     public void connect(Player player) {
-        assert (!isFull()) : "Room " + this.toString() + " is full";
         players.add(player);
         playersIn++;
     }

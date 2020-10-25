@@ -10,12 +10,11 @@ import seaBattle.rooms.Room;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Single extends GameMode {
+public class Single implements GameMode {
     private Room room;
 
     @Override
     public void play(String userName) throws UI.input.CommandException  {
-        super.userName = userName;
         UI.print.line();
         System.out.println("             Welcome to ＳＩＮＧＬＥ　ＭＯＤＥ, Dear " + userName + "! ヽ(・∀・)ﾉ");
         UI.print.line();
@@ -29,9 +28,7 @@ public class Single extends GameMode {
                         : new UI(userName));
         for (int i = 1; i < room.size(); i++) {
             if (room.getPrevPlayer(i).isHuman()) UI.print.space();
-            room.connect(
-                    findPlayer(
-                            room.getPrevPlayer(i).getName()));
+            room.connect(findPlayer());
             UI.print.line();
         }
         for (int i = 0; i < room.size(); i++) {
@@ -41,46 +38,26 @@ public class Single extends GameMode {
         System.out.println("\n\n              \uD835\uDD43\uD835\uDD56\uD835\uDD65❜\uD835\uDD64 \uD835\uDD64\uD835\uDD65\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD52\uD835\uDD63\uD835\uDD65!  ►\n\n");
         UI.print.space();
         Object[][] rating = mainLoop();
-//        String winnerName = order[order.length - 1].getName();
-//        String repName = winnerName.repeat(50) + "\n";
-//        System.out.println("\n\n" +
-//                "                ▒█░░▒█ ▀█▀ ▒█▄░▒█ \n" +
-//                "                ▒█▒█▒█ ▒█░ ▒█▒█▒█ \n" +
-//                "                ▒█▄▀▄█ ▄█▄ ▒█░░▀█ \n\n" +
-//                "       (⌐■_■)       " + winnerName + "       (╮°-°)╮┳━━┳ (╯°□°)╯ ┻━━┻ \n\n");
-//        System.out.println(repName.repeat(50));
-//        System.out.println("\n\n" +
-//                "    ███████████████████████████████████\n" +
-//                "    ███████████▀▀▀░░░░░░░▀▀▀███████████\n" +
-//                "    ████████▀░░░░░░░░░░░░░░░░░▀████████\n" +
-//                "    ███████│░░░░░░░░░░░░░░░░░░░│███████\n" +
-//                "    ██████▌│░░░░░░░░░░░░░░░░░░░│▐██████\n" +
-//                "    ██████░└┐░░░░░░░░░░░░░░░░░┌┘░██████\n" +
-//                "    ██████░░└┐░░░░░░░░░░░░░░░┌┘░░██████\n" +
-//                "    ██████░░┌┘▄▄▄▄▄░░░░░▄▄▄▄▄└┐░░██████\n" +
-//                "    ██████▌░│██████▌░░░▐██████│░▐██████\n" +
-//                "    ███████░│▐███▀▀░░▄░░▀▀███▌│░███████\n" +
-//                "    ██████▀─┘░░░░░░░▐█▌░░░░░░░└─▀██████\n" +
-//                "    ██████▄░░░▄▄▄▓░░▀█▀░░▓▄▄▄░░░▄██████\n" +
-//                "    ████████▄─┘██▌░░░░░░░▐██└─▄████████\n" +
-//                "    █████████░░▐█─┬┬┬┬┬┬┬─█▌░░█████████\n" +
-//                "    ████████▌░░░▀┬┼┼┼┼┼┼┼┬▀░░░▐████████\n" +
-//                "    █████████▄░░░└┴┴┴┴┴┴┴┘░░░▄█████████\n" +
-//                "    ███████████▄░░░░░░░░░░░▄███████████\n" +
-//                "    ██████████████▄▄▄▄▄▄▄██████████████\n");
+        System.out.println("Foooof, game is finished. It was hard, but you've done it ╰(▔∀▔)╯ \n" +
+                "And you can see the results:");
+        System.out.println("\n\n" +
+                "                ▒█░░▒█ ▀█▀ ▒█▄░▒█ \n" +
+                "                ▒█▒█▒█ ▒█░ ▒█▒█▒█ \n" +
+                "                ▒█▄▀▄█ ▄█▄ ▒█░░▀█ \n\n" +
+                "       (⌐■_■)       " + rating[0][0] + "       (╮°-°)╮┳━━┳ (╯°□°)╯ ┻━━┻ \n\n");
         UI.print.rating.table(rating);
-        System.out.print("What do you want to do next? ... ");
+        System.out.println("Is it time to say good bye? (>﹏<)");
         UI.input.command();
     }
 
     @Override
-    public Player findPlayer(String prevPlayerName) throws UI.input.CommandException {
+    public Player findPlayer() throws UI.input.CommandException {
         Player player;
-        System.out.println("It's time to choose your opponent, " + prevPlayerName + ": Q (｀⌒´Q)\n" +
+        System.out.println("It's time to choose your opponent, : Q (｀⌒´Q)\n" +
                 "    0 - PC (This machine is stupid, but lucky)\n" +
                 "    1 - Player (Like PC, but on the contrary)\n" +
                 ">>> Make your choice (◕‿◕)");
-        int gameMode = UI.input.mode(1);
+        int gameMode = UI.input.mode(2);
         UI.print.line();
         switch (gameMode) {
             case 0 -> {
@@ -98,7 +75,7 @@ public class Single extends GameMode {
     }
 
     @Override
-    public void fillField(Player player) throws UI.input.CommandException  {
+    public void fillField(Player player) throws UI.input.CommandException {
         if (player.isHuman()) {
             System.out.println("\nWhat a pity! " + player.getName() + ", your field is empty, let's fill it (ﾉ◕ヮ◕)ﾉ*: ･ﾟ✧");
         }
@@ -115,8 +92,7 @@ public class Single extends GameMode {
     @Override
     public Object[][] mainLoop() throws UI.input.CommandException {
         ArrayList<Object[]> result = new ArrayList<>(room.size());
-        Player attacking;
-        Player defencing;
+        Player attacking; Player defencing;
         room.start();
         do {
             attacking = room.getAttacking();
@@ -132,7 +108,7 @@ public class Single extends GameMode {
                 if (defencing.isHuman()) UI.print.space();
             }
         } while (result.size() < room.size() - 1);
-        result.add(new Object[]{attacking.getName(), defencing.getScore()});
+        result.add(new Object[]{attacking.getName(), attacking.getScore()});
         Collections.reverse(result);
         return result.toArray(Object[][]::new);
     }

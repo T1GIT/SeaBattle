@@ -3,6 +3,8 @@ import seaBattle.field.Boat;
 import seaBattle.field.Field;
 import seaBattle.players.types.UI;
 
+import java.io.IOException;
+
 
 public abstract class Player {
     public final static int MAX_NAME_LENGTH = Field.SIZE * 3 + 8;

@@ -1,8 +1,10 @@
 package seaBattle.players.types;
 
-import seaBattle.field.*;
-import seaBattle.network.Server;
+import seaBattle.field.Boat;
+import seaBattle.field.Field;
+import seaBattle.field.Point;
 import seaBattle.players.Player;
+import seaBattle.rooms.Room;
 import seaBattle.rooms.WebRoom;
 
 import java.util.Arrays;
@@ -26,7 +28,7 @@ public class UI extends Player {
             try {
                 print.line();
                 print.tableWithStorage(this);
-                System.out.println("\n<<< Input coordinates of your new boat, Your Majesty ... ╰(*´︶`*)╯♡    (r - for random boat, random - for autofilling)");
+                System.out.println("\n>>> Input coordinates of your new boat, Your Majesty ... ╰(*´︶`*)╯♡    (r - for random boat, random - for autofilling)");
                 System.out.print("X₁  Y₁  X₂  Y₂ : ");
                 if (autoBoat) {
                     Boat boat = PC.rand.boat(this.field);
@@ -87,7 +89,7 @@ public class UI extends Player {
             try {
                 print.line();
                 print.tableWithEnemy(this, enemy);
-                System.out.println("\n<<< Input coordinates for attack, Your Majesty ... /(≧▽≦)/");
+                System.out.println("\n>>> Input coordinates for attack, Your Majesty ... /(≧▽≦)/");
                 System.out.print("X  Y : ");
                 if (autoAction) {
                     int[] coor = PC.rand.action(enemyField);
@@ -195,8 +197,8 @@ public class UI extends Player {
             }
 
             public static void table(Object[][] rating) {
-                System.out.println();
                 int margin = (Player.MAX_NAME_LENGTH) / 2;
+                System.out.println("\n" + " ".repeat(margin - 2) + "ＳＣＯＲＥ ＢＯＡＲＤ\n");
                 System.out.println("PLACE" + " ".repeat(margin) + "NAME" + " ".repeat(margin) + "POINTS");
                 int points; String name;
                 for (int i = 0, place = 1; i < rating.length; i++, place++) {
@@ -220,19 +222,22 @@ public class UI extends Player {
             public static class Reset extends CommandException {}
             public static class RandomBoat extends CommandException {}
             public static class RandomField extends CommandException {}
+            public static class AddRoom extends CommandException {}
             public static class Chat extends CommandException {public Chat(String msg) {super(msg);}}
         }
 
-        public static int mode(int maxVal) throws CommandException {
+        public static int mode(int amountOfVariants, String word) throws CommandException {
             while (true) {
                 try {
-                    System.out.print("Mode: ");
+                    System.out.print(word + ": ");
                     int res = input.command(1)[0];
-                    if (res > maxVal || res < 0) incorrectInput();
+                    if (res >= amountOfVariants || res < 0) incorrectInput();
                     else return res;
                 } catch (InputMismatchException e) { incorrectInput(); }
             }
         }
+
+        public static int mode(int amountOfVariants) throws CommandException { return mode(amountOfVariants, "Mode"); }
 
         public static int amountOfPlayers(int maxPlayers) throws CommandException {
             while (true) {
@@ -246,7 +251,7 @@ public class UI extends Player {
         }
 
         public static int amountOfPlayers() throws CommandException {
-            return amountOfPlayers(1000);
+            return amountOfPlayers(Room.MAX_PLAYERS);
         }
 
         public static String roomName() {
@@ -270,6 +275,8 @@ public class UI extends Player {
                 } else return res;
             }
         }
+
+        public static byte[] password() { return WebRoom.security.hash(new Scanner(System.in).nextLine()); }
 
         public static void command() throws CommandException { command(0); }
 

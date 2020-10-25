@@ -3,10 +3,14 @@ package seaBattle.players.types;
 import seaBattle.field.Boat;
 import seaBattle.network.Connection;
 import seaBattle.players.Player;
+import seaBattle.rooms.WebRoom;
+
+import java.io.IOException;
 
 
 public class WEB extends Player {
     private final Connection conn;
+//    private final WebRoom room;
 
     public WEB(String name, Connection connection) {
         super(name);

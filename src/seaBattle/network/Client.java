@@ -30,27 +30,28 @@ public class Client implements seaBattle.network.Socket {
     }
 
     @Override
-    public void send(Object data) {
+    public void send(Object data) throws DisconnectException {
         try {
-            out.writeObject(data);
-        } catch (IOException e) { disconnect(); }
+            out.writeObject((Object) data);
+        } catch (IOException e) { throw new DisconnectException(); }
     }
 
     @Override
-    public Object receive() {
+    public Object receive() throws DisconnectException {
+        Object res = null;
         try {
-            Object res;
             do {
                 res = in.readObject();
             } while (res == null);
-            if (((Object[]) res)[0].equals("chat")) {
-                System.out.println(((Object[]) res)[1]);
-                return receive();
-            }
-            return res;
-        } catch (IOException e) { disconnect();
-        } catch (ClassNotFoundException e) { e.printStackTrace(); }
-        return null;
+            try {
+                if (((Object[]) res)[0].equals("chat")) {
+                    System.out.println(((Object[]) res)[1]);
+                    return receive();
+                }
+            } catch (ClassCastException ignored) { }
+        } catch (ClassNotFoundException e) { e.printStackTrace();
+        } catch (IOException e) { throw new DisconnectException(); }
+        return res;
     }
 
     @Override

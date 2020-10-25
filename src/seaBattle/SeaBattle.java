@@ -7,10 +7,9 @@ import seaBattle.players.types.*;
 
 
 public class SeaBattle {
-
-
-    public void start() {
+    public static void main(String[] args) {
         try {
+            // Meeting
             System.out.println("\n" +
                     "█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████\n" +
                     "█░░░░░░░░░░░░░░█░░░░░░░░░░░░░░█░░░░░░░░░░░░░░████░░░░░░░░░░░░░░███░░░░░░░░░░░░░░█░░░░░░░░░░░░░░█░░░░░░░░░░░░░░█░░░░░░█████████░░░░░░░░░░░░░░█\n" +
@@ -32,24 +31,29 @@ public class SeaBattle {
             UI.print.line();
             System.out.println("                         Nice to meet You, " + userName + "! (*^‿^*)");
             UI.print.line();
+            // Mode choosing
             System.out.println("Please choose mode for game: \n" +
                     "    0 - Single (Fight with local players)\n" +
                     "    1 - Multiplayer (Play with gamers around the world)\n" +
                     ">>> Make your choice ヽ(o^―^o)ﾉ");
-            int gameMode = UI.input.mode(1);
+            int gameMode = UI.input.mode(2);
             GameMode game = switch (gameMode) {
                 case 0 -> new Single();
                 case 1 -> new Multiplayer();
                 default -> throw new IllegalStateException("Unknown game mode " + gameMode);
             };
+            // Running
+            UI.print.space();
             game.play(userName);
+            // Catches commands from user
+            // TODO: Catch com. exceptions in the Multiplayer and close the socket then throw them forward
         } catch (UI.input.CommandException e) {
             String[] name = e.getClass().getCanonicalName().split("\\.");
             switch (name[name.length - 1]) {
                 case "Exit" -> System.exit(69);
                 case "Reset" -> {
                     UI.print.space();
-                    start();
+                    main(null);
                 }
                 default -> e.printStackTrace();
             }

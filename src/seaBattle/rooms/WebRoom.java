@@ -1,68 +1,59 @@
 package seaBattle.rooms;
 
-import seaBattle.network.Server;
 import seaBattle.players.Player;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class WebRoom extends Room {
     public final static int MAX_NAME_LENGTH = 30;
-    private final String name;
     private byte[] psw;
 
-    public String getName() { return name; }
-
-    public WebRoom(String name, Player player) { this(name, player, 2); }
-
-    public WebRoom(String name, Player player, int size) {
+    public WebRoom(Player player, int size) {
         super(size);
-        assert (size <= Server.getFreeConn()): "Server have no free connections to making room";
-        this.name = name;
         this.connect(player);
     }
 
-    public WebRoom(String name, Player player, byte[] psw) { this(name, player, 2, psw); }
-
-    public WebRoom(String name, Player player, int size, byte[] psw) {
-        this(name, player, size);
+    public WebRoom(Player player, int size, byte[] psw) {
+        this(player, size);
         this.psw = psw;
     }
 
-    public boolean tryConnect(Player player, byte[] inPsw) {
-        if (Security.checkPsw(this.psw, inPsw)) {
-            super.connect(player);
-            return true;
-        } else return false;
-    }
+    public boolean isLocked() { return this.psw != null; }
 
-    public String getPrinted() {
-        String lock = Security.isLocked(this) ? "\uD83D\uDD12" : "";
-        return String.format("%2s %-" + MAX_NAME_LENGTH + "s%3d \\ %d",
-                lock,
-                name,
-                getPlayersIn(),
-                size());
-    }
+    public boolean checkPsw(byte[] inPsw) { return security.checkPsw(this.psw, inPsw); }
 
-    public static String[] getPrinted(List<WebRoom> roomList) {
-        String[] res = new String[roomList.size()];
-        ListIterator<WebRoom> iter = roomList.listIterator();
-        while (iter.hasNext()) {
-            int num = iter.nextIndex();
-            WebRoom room = iter.next();
-            res[num] = String.format("%2d %s", num, room.getPrinted());
+    public static HashMap<String, Object[]> pack(HashMap<String, WebRoom> rooms) {
+        HashMap<String, Object[]> res = new HashMap<>(rooms.size());
+        for (Map.Entry<String, WebRoom> entry: rooms.entrySet()) {
+            WebRoom room = entry.getValue();
+            res.put(entry.getKey(), new Object[]{
+                    room.isLocked(),
+                    room.getPlayersIn(),
+                    room.size()
+            });
         }
         return res;
     }
 
-    public static class Security {
-        public static boolean isLocked(WebRoom room) { return room.psw != null; }
+    public static void print(HashMap<String, Object[]> pack) {
+        System.out.println(" ".repeat(Player.MAX_NAME_LENGTH / 2) + "\uD835\uDE81\uD835\uDE7E\uD835\uDE7E\uD835\uDE7C\uD835\uDE82");
+        int num = 0;
+        for (Map.Entry<String, Object[]> entry: pack.entrySet()) {
+            Object[] data = entry.getValue();
+            System.out.printf("%2d %2s %-" + MAX_NAME_LENGTH + "s %3s \\ %s\n",
+                    num,
+                    (boolean) data[0] ? "\uD83D\uDD12" : "",
+                    entry.getKey(),
+                    data[1],
+                    data[2]);
+            num++;
+        }
+    }
 
+    public static class security {
         public static byte[] hash(String str) {
             try {
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -74,5 +65,10 @@ public class WebRoom extends Room {
         }
 
         public static boolean checkPsw(byte[] hashPsw, byte[] inPsw) { return Arrays.equals(hashPsw, inPsw); }
+    }
+
+    public interface RoomConnecting{
+        void connectRoom();
+        void createRoom(boolean withPsw);
     }
 }

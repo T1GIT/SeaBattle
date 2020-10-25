@@ -41,10 +41,10 @@ public class Point {
      */
     public void setStateByAnswer(byte answer) {
         switch (answer) {
-            case 0: this.state = 4; break;
-            case 1: this.state = 2; break;
-            case 2: this.state = 3; break;
-            default: throw new IllegalStateException("Unexpected answer: " + answer);
+            case 0 -> this.state = 4;
+            case 1 -> this.state = 2;
+            case 2 -> this.state = 3;
+            default -> throw new IllegalStateException("Unexpected answer: " + answer);
         }
     }
 }
