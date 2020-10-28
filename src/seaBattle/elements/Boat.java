@@ -1,6 +1,8 @@
-package seaBattle.field;
+package seaBattle.elements;
 
-public class Boat {
+import java.io.Serializable;
+
+public class Boat implements Serializable {
     final private byte[] xPos;
     final private byte[] yPos;
     private byte wounds = 0;
@@ -17,15 +19,15 @@ public class Boat {
     }
     public Boat(int[] coors) { this(coors[0], coors[1], coors[2], coors[3]); }
 
-    public byte[] getxPos() {return this.xPos;}
+    public int[] getxPos() { return new int[]{xPos[0], xPos[1]}; }
 
-    public byte[] getyPos() {return this.yPos;}
+    public int[] getyPos() { return new int[]{yPos[0], yPos[1]}; }
 
-    public byte getWounds() {return this.wounds;}
+    public int getWounds() { return this.wounds; }
 
-    public byte length() {return (byte) (Math.max(xPos[1] - xPos[0], yPos[1] - yPos[0]) + 1);}
+    public int length() { return Math.max(xPos[1] - xPos[0], yPos[1] - yPos[0]) + 1; }
 
-    public boolean isDead() {return this.wounds == length();}
+    public boolean isDead() { return this.wounds == length(); }
 
     public void wound() { this.wounds++; }
 }

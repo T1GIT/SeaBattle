@@ -1,15 +1,13 @@
 package seaBattle.players.types;
 
-import seaBattle.field.Boat;
+import seaBattle.elements.Boat;
 import seaBattle.network.Connection;
 import seaBattle.players.Player;
-import seaBattle.rooms.WebRoom;
-
-import java.io.IOException;
 
 
 public class WEB extends Player {
     private final Connection conn;
+    private boolean ready;
 
     public Connection getConn() { return conn; }
 
@@ -43,4 +41,10 @@ public class WEB extends Player {
     public void retAnswer(int code) {
         conn.send(code);
     }
+
+    public void lose() { this.lose = true; }
+
+    public void ready() { this.ready = true; }
+
+    public boolean isReady() { return ready; }
 }

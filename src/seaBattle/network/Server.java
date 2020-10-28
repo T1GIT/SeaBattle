@@ -5,6 +5,7 @@ import seaBattle.rooms.WebRoom;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -15,13 +16,11 @@ public class Server extends Thread{
     public static final int PORT = 4444;
     public static final int MAX_CONNECTS = 50;
     public static final int MAX_ROOMS = (MAX_CONNECTS + 1) / 2;
-    public static final HashSet<Connection> connects = new HashSet<>(MAX_CONNECTS);
-    public static final HashMap<String, WebRoom> freeRooms = new HashMap<>(MAX_ROOMS);
-    public static final HashMap<String, WebRoom> engagedRooms = new HashMap<>(MAX_ROOMS);
+    public final HashSet<Connection> connects = new HashSet<>(MAX_CONNECTS);
+    public final HashMap<String, WebRoom> freeRooms = new HashMap<>(MAX_ROOMS);
+
 
     public Server() {
-        Server.freeRooms.put("test1" ,new WebRoom(null, 2));
-        Server.freeRooms.put("test2", new WebRoom(null, 5, WebRoom.security.hash("0000")));
         try {
             InetAddress addr = InetAddress.getByName(HOST);
             serverSocket = new ServerSocket(PORT, MAX_CONNECTS, addr);
@@ -33,12 +32,19 @@ public class Server extends Thread{
     public void run() {
         try {
             while (super.isAlive()) {
-                Connection connection = new Connection(serverSocket.accept());
-                connects.add(connection);
-                System.out.println("    Client connected: " + connection.getName());
+                Connection connection = new Connection(this, serverSocket.accept());
+                if (connects.size() >= MAX_CONNECTS) {
+                    System.out.print("    Client discarded: ");
+                    connection.disconnect();
+                } else {
+                    System.out.println("    Client connected: " + connection.getName());
+                    connects.add(connection);
+                }
             }
         } catch (IOException e) { e.printStackTrace(); }
     }
+
+    public int getAvailablePlaces() { return Server.MAX_CONNECTS - this.connects.size(); }
 
     public static void main(String[] args) {
         Server server = new Server();

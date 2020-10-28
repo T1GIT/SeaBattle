@@ -1,6 +1,8 @@
-package seaBattle.field;
+package seaBattle.elements;
 
-public class Point {
+import java.io.Serializable;
+
+public class Point implements Serializable {
     private Boat boat;
     private byte state;
     final static private char[] drawDict = {

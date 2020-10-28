@@ -1,6 +1,6 @@
 package seaBattle.players.types;
 
-import seaBattle.field.*;
+import seaBattle.elements.*;
 import seaBattle.players.Player;
 
 import java.util.Random;

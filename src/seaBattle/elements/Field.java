@@ -1,9 +1,11 @@
-package seaBattle.field;
+package seaBattle.elements;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
-public class Field {
+public class Field implements Serializable {
     final public static byte SIZE = 10;
     final public static byte MAX_BOAT_LENGTH = 4;
     final private Point[][] table;
@@ -60,17 +62,19 @@ public class Field {
         return placeIsEmpty(p1[0], p1[1], p2[0], p2[1]);
     }
 
+    public boolean placeIsEmpty(Boat boat) { return placeIsEmpty(boat.getxPos(), boat.getyPos()); }
+
     public boolean hasInStorage(int length) {
         return unusedBoats[length - 1] > 0;
     }
 
-    public boolean isStorageEmpty() {
-        for (int am : unusedBoats) if (am != 0) return false;
-        return true;
+    public boolean isStorageAvailable() {
+        for (int am : unusedBoats) if (am != 0) return true;
+        return false;
     }
 
-    public boolean isAlive() {
-        for (int am : aliveBoats) if (am != 0) return true;
+    public boolean isDead() {
+        for (int am : aliveBoats) if (am == 0) return true;
         return false;
     }
 
@@ -115,11 +119,11 @@ public class Field {
      * @param boat for placing
      */
     public void setBoat(Boat boat) {
-        byte[] xDist = boat.getxPos();
-        byte[] yDist = boat.getyPos();
-        byte length = boat.length();
-        for (byte _x = xDist[0]; _x <= xDist[1]; _x++) {
-            for (byte _y = yDist[0]; _y <= yDist[1]; _y++) {
+        int[] xDist = boat.getxPos();
+        int[] yDist = boat.getyPos();
+        int length = boat.length();
+        for (int _x = xDist[0]; _x <= xDist[1]; _x++) {
+            for (int _y = yDist[0]; _y <= yDist[1]; _y++) {
                 this.table[_y][_x].setBoat(boat);
             }
         }
@@ -133,8 +137,8 @@ public class Field {
      * the {@code boat}
      */
     private Point[] getEnv(Boat boat) {
-        byte[] xPos = boat.getxPos();
-        byte[] yPos = boat.getyPos();
+        int[] xPos = boat.getxPos();
+        int[] yPos = boat.getyPos();
         ArrayList<Point> env = new ArrayList<>();
         int x1 = Math.max(0, xPos[0] - 1);
         int x2 = Math.min(xPos[1] + 1, SIZE - 1);
@@ -156,11 +160,11 @@ public class Field {
      * that {@code boat} engages
      */
     private Point[] getBoatPoints(Boat boat) {
-        byte[] xPos = boat.getxPos();
-        byte[] yPos = boat.getyPos();
+        int[] xPos = boat.getxPos();
+        int[] yPos = boat.getyPos();
         ArrayList<Point> boatPoints = new ArrayList<>(boat.length());
-        for (byte _x = xPos[0]; _x <= xPos[1]; _x++) {
-            for (byte _y = yPos[0]; _y <= yPos[1]; _y++) {
+        for (int _x = xPos[0]; _x <= xPos[1]; _x++) {
+            for (int _y = yPos[0]; _y <= yPos[1]; _y++) {
                 boatPoints.add(this.table[_y][_x]);
             }
         }
@@ -177,9 +181,7 @@ public class Field {
         res[2] = "┣ ━━━ ┳ " + "━━ ".repeat(LINE_LEN / 3) + "━┫";
         StringBuilder numbers = new StringBuilder();
         numbers.append("┃     ┃ ");
-        for (int i = 0; i < SIZE; i++) {
-            numbers.append(" ").append(i).append(" ");
-        }
+        for (int i = 0; i < SIZE; i++) numbers.append(" ").append(i).append(" ");
         numbers.append(" ┃");
         res[3] = numbers.toString();
         res[4] = "┣ ━━━ ╋ " + "━━ ".repeat(LINE_LEN / 3) + "━┫";

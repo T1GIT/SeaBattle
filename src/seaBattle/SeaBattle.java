@@ -5,6 +5,8 @@ import seaBattle.modes.types.Multiplayer;
 import seaBattle.modes.types.Single;
 import seaBattle.players.types.*;
 
+import java.util.InputMismatchException;
+
 
 public class SeaBattle {
     public static void main(String[] args) {
@@ -36,7 +38,7 @@ public class SeaBattle {
                     "    0 - Single (Fight with local players)\n" +
                     "    1 - Multiplayer (Play with gamers around the world)\n" +
                     ">>> Make your choice ヽ(o^―^o)ﾉ");
-            int gameMode = UI.input.mode(2);
+            int gameMode = UI.input.variant(2, "Game mode");
             GameMode game = switch (gameMode) {
                 case 0 -> new Single();
                 case 1 -> new Multiplayer();
@@ -45,6 +47,12 @@ public class SeaBattle {
             // Running
             UI.print.space();
             game.play(userName);
+            // Ended
+            System.out.println("Is it time to say good bye? (>﹏<)");
+            while (true) {
+                try { UI.input.command(); }
+                catch (InputMismatchException e) { UI.print.incorrectInput(); }
+            }
             // Catches commands from user
             // TODO: Catch com. exceptions in the Multiplayer and close the socket then throw them forward
         } catch (UI.input.CommandException e) {

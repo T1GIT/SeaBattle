@@ -1,23 +1,23 @@
 package seaBattle.players;
-import seaBattle.field.Boat;
-import seaBattle.field.Field;
+import seaBattle.elements.Boat;
+import seaBattle.elements.Field;
 import seaBattle.players.types.UI;
-
-import java.io.IOException;
 
 
 public abstract class Player {
     public final static int MAX_NAME_LENGTH = Field.SIZE * 3 + 8;
     /**
-     * Points for answer from {@code attackMe()} matching index in the array
+     * Points for actions
      * 0: for passing
      * 1: for wounding
      * 2: for killing
+     * 3: for checking losing
      */
-    protected final static int[] POINTS_FOR_STATE = new int[]{-1, 1, 2};
+    protected final static int[] POINTS_FOR_STATE = new int[]{-1, 1, 2, 1};
     protected final Field field;
     private final String name;
     protected int score = 0;
+    protected boolean lose = false;
 
     public Field getField() { return this.field; }
     public String getName() { return this.name; }
@@ -40,14 +40,18 @@ public abstract class Player {
      *      1 - wounded
      *      2 - killed
      */
-    public int attackMe(int[] coor) { return this.field.attack(coor[0], coor[1]); }
+    public int attackMe(int[] coor) {
+        int answer = this.field.attack(coor[0], coor[1]);
+        this.lose = field.isDead();
+        return answer;
+    }
 
     /**
      * @return True if player have no alive boat on its field
      */
-    public boolean isAlive() {
-        this.score++;
-        return this.field.isAlive();
+    public boolean isLose() {
+        this.score += POINTS_FOR_STATE[3];
+        return lose;
     }
 
     /**

@@ -11,7 +11,7 @@ public interface GameMode {
      * Starts the game and uses other functions
      * @throws UI.input.CommandException if user typed command
      */
-    void play(String userName) throws UI.input.CommandException ;
+    void play(String userName) throws UI.input.CommandException;
 
     /**
      * Is requesting another players for the game until all places will be engaged

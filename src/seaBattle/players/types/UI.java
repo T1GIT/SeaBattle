@@ -1,10 +1,9 @@
 package seaBattle.players.types;
 
-import seaBattle.field.Boat;
-import seaBattle.field.Field;
-import seaBattle.field.Point;
+import seaBattle.elements.Boat;
+import seaBattle.elements.Field;
+import seaBattle.elements.Point;
 import seaBattle.players.Player;
-import seaBattle.rooms.Room;
 import seaBattle.rooms.WebRoom;
 
 import java.util.Arrays;
@@ -32,8 +31,8 @@ public class UI extends Player {
                 System.out.print("X₁  Y₁  X₂  Y₂ : ");
                 if (autoBoat) {
                     Boat boat = PC.rand.boat(this.field);
-                    byte [] xDist = boat.getxPos();
-                    byte [] yDist = boat.getyPos();
+                    int [] xDist = boat.getxPos();
+                    int [] yDist = boat.getyPos();
                     System.out.println(xDist[0] + " " + yDist[0] + " " + xDist[1] + " " + yDist[1]);
                     return boat;
                 }
@@ -78,7 +77,7 @@ public class UI extends Player {
                     else return new Boat(x1, y1, x2, y2);
                 }
             }
-            catch (InputMismatchException | NumberFormatException e) { incorrectInput(); }
+            catch (InputMismatchException | NumberFormatException e) { print.incorrectInput(); }
         }
     }
 
@@ -114,22 +113,20 @@ public class UI extends Player {
                     if (point.isAttackable()) return new int[]{x, y};
                     else System.out.println("Attacking one point second time isn't good idea (๏̯͡๏)");
                 }
-            } catch (InputMismatchException e) { incorrectInput(); }
+            } catch (InputMismatchException e) { print.incorrectInput(); }
         }
     }
 
     @Override
     public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed
-        switch (code) {
-            case 0 -> System.out.println("This place is empty (ﾉ>_<)ﾉ");
-            case 1 -> System.out.println("Wow, it was an accurate shot, Sir  w (ﾟｏﾟ)w");
-            case 2 -> System.out.println("Another one kill, congratulations (￣^￣)ゞ");
+        System.out.println(switch (code) {
+            case 0 -> "This place is empty (ﾉ>_<)ﾉ";
+            case 1 -> "Wow, it was an accurate shot, Sir  w (ﾟｏﾟ)w";
+            case 2 -> "Another one kill, congratulations (￣^￣)ゞ";
             default -> throw new IllegalStateException("Unexpected answer code: " + code);
-        }
+        });
         score += POINTS_FOR_STATE[code];
     }
-
-    private static void incorrectInput() { System.out.println("<<< Sorry, but your slave cannot understand you  (╥﹏╥)"); }
 
     public static class print {
         private static final int MARGIN = 10;
@@ -178,6 +175,8 @@ public class UI extends Player {
             System.out.println("⎯".repeat(LEN));
         }
 
+        public static void incorrectInput() { System.out.println("<<< Sorry, but your slave cannot understand you  (╥﹏╥)"); }
+
         public static class rating {
             public static void ladder(Object[][] rating) {
                 final int WIDTH = Player.MAX_NAME_LENGTH;
@@ -197,9 +196,10 @@ public class UI extends Player {
             }
 
             public static void table(Object[][] rating) {
+                final boolean WITH_HAT = false;
                 int margin = (Player.MAX_NAME_LENGTH) / 2;
                 System.out.println("\n" + " ".repeat(margin - 2) + "ＳＣＯＲＥ ＢＯＡＲＤ\n");
-                System.out.println("PLACE" + " ".repeat(margin) + "NAME" + " ".repeat(margin) + "POINTS");
+                if (WITH_HAT) System.out.println("PLACE" + " ".repeat(margin) + "NAME" + " ".repeat(margin) + "POINTS");
                 int points; String name;
                 for (int i = 0, place = 1; i < rating.length; i++, place++) {
                     name = (String) rating[i][0];
@@ -210,11 +210,12 @@ public class UI extends Player {
                 System.out.println();
             }
         }
+
     }
 
     public static class input {
 
-        public static class CommandException extends Exception {
+        public static class CommandException extends RuntimeException {
             CommandException() {}
             CommandException(String msg) { super(msg); }
 
@@ -226,32 +227,27 @@ public class UI extends Player {
             public static class Chat extends CommandException {public Chat(String msg) {super(msg);}}
         }
 
-        public static int mode(int amountOfVariants, String word) throws CommandException {
+        public static int variant(int amountOfVariants, String phrase) throws CommandException {
             while (true) {
                 try {
-                    System.out.print(word + ": ");
+                    System.out.print(phrase + ": ");
                     int res = input.command(1)[0];
-                    if (res >= amountOfVariants || res < 0) incorrectInput();
+                    if (res >= amountOfVariants || res < 0) System.out.println("Can't find this answer");
                     else return res;
-                } catch (InputMismatchException e) { incorrectInput(); }
+                } catch (InputMismatchException e) { print.incorrectInput(); }
             }
         }
-
-        public static int mode(int amountOfVariants) throws CommandException { return mode(amountOfVariants, "Mode"); }
 
         public static int amountOfPlayers(int maxPlayers) throws CommandException {
             while (true) {
                 try {
                     System.out.print("Amount: ");
                     int res = input.command(1)[0];
-                    if (res > maxPlayers || res < 2) incorrectInput();
+                    if (res > maxPlayers) System.out.println("Players amount can't be more then " + maxPlayers);
+                    else if (res < 2) System.out.println("At least 2 players should participate");
                     else return res;
-                } catch (InputMismatchException e) { incorrectInput(); }
+                } catch (InputMismatchException e) { print.incorrectInput(); }
             }
-        }
-
-        public static int amountOfPlayers() throws CommandException {
-            return amountOfPlayers(Room.MAX_PLAYERS);
         }
 
         public static String roomName() {
@@ -260,7 +256,6 @@ public class UI extends Player {
                 String res = new Scanner(System.in).nextLine();
                 if (res.length() > WebRoom.MAX_NAME_LENGTH) {
                     System.out.println("          Unfortunately, this name is too long (maximum length is " + WebRoom.MAX_NAME_LENGTH + " symbols)");
-                    print.line();
                 } else return res;
             }
         }
@@ -271,35 +266,43 @@ public class UI extends Player {
                 String res = new Scanner(System.in).nextLine();
                 if (res.length() > Player.MAX_NAME_LENGTH) {
                     System.out.println("          Unfortunately, this name is too long (maximum length is " + Player.MAX_NAME_LENGTH + " symbols)");
-                    print.line();
+                } else if (res.length() == 0) {
+                    System.out.println("          Name should include at least 1 symbol");
                 } else return res;
             }
         }
 
         public static byte[] password() {
-            System.out.print("Password: ");
-            return WebRoom.security.hash(new Scanner(System.in).nextLine());
+            String psw;
+            while (true) {
+                System.out.print("Password: ");
+                psw = new Scanner(System.in).nextLine();
+                if (psw.length() > WebRoom.security.MAX_PSW_LEN) {
+                    System.out.println("Password can't be longer then " + WebRoom.security.MAX_PSW_LEN);
+                } else if (psw.length() < WebRoom.security.MIN_PSW_LEN) {
+                    System.out.println("Password can't be shorter then " + WebRoom.security.MIN_PSW_LEN);
+                } else break;
+            }
+            return WebRoom.security.hash(psw);
         }
 
         public static void command() throws CommandException { command(0); }
 
-        public static int[] command(int argsAmount) throws CommandException, InputMismatchException {
-            while (true) {
-                String[] cmd = new Scanner(System.in).nextLine().toLowerCase().strip().split("\\s+");
-                switch (cmd[0]) {
-                    case "reset" -> throw new CommandException.Reset();
-                    case "exit" -> throw new CommandException.Exit();
-                    case "r" -> throw new CommandException.RandomBoat();
-                    case "random" -> throw new CommandException.RandomField();
-                    case "chat" -> throw new CommandException.Chat(String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length)));
-                    default -> {
-                        if (cmd.length != argsAmount) throw new InputMismatchException();
-                        int[] args = new int[argsAmount];
-                        try {
-                            for (int i = 0; i < argsAmount; i++) args[i] = Integer.parseInt(cmd[i]);
-                        } catch (NumberFormatException e) { throw new InputMismatchException(); }
-                        return args;
-                    }
+        public static int[] command(int argsAmount) throws CommandException {
+            String[] cmd = new Scanner(System.in).nextLine().toLowerCase().strip().split("\\s+");
+            switch (cmd[0]) {
+                case "reset" -> throw new CommandException.Reset();
+                case "exit" -> throw new CommandException.Exit();
+                case "r" -> throw new CommandException.RandomBoat();
+                case "random" -> throw new CommandException.RandomField();
+                case "chat" -> throw new CommandException.Chat(String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length)));
+                default -> {
+                    if (cmd.length != argsAmount) throw new InputMismatchException();
+                    int[] args = new int[argsAmount];
+                    try {
+                        for (int i = 0; i < argsAmount; i++) args[i] = Integer.parseInt(cmd[i]);
+                    } catch (NumberFormatException e) { throw new InputMismatchException(); }
+                    return args;
                 }
             }
         }

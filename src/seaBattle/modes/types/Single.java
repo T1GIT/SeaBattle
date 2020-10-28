@@ -1,14 +1,11 @@
 package seaBattle.modes.types;
 
-import seaBattle.field.Field;
+import seaBattle.elements.Field;
 import seaBattle.modes.GameMode;
 import seaBattle.players.Player;
 import seaBattle.players.types.PC;
 import seaBattle.players.types.UI;
 import seaBattle.rooms.Room;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class Single implements GameMode {
     private Room room;
@@ -19,7 +16,7 @@ public class Single implements GameMode {
         System.out.println("             Welcome to ＳＩＮＧＬＥ　ＭＯＤＥ, Dear " + userName + "! ヽ(・∀・)ﾉ");
         UI.print.line();
         System.out.println("How many peoples are here? (⊙▂⊙)");
-        int amount = UI.input.amountOfPlayers();
+        int amount = UI.input.amountOfPlayers(Room.MAX_PLAYERS);
         UI.print.line();
         room = new Room(amount);
         room.connect(
@@ -44,10 +41,8 @@ public class Single implements GameMode {
                 "                ▒█░░▒█ ▀█▀ ▒█▄░▒█ \n" +
                 "                ▒█▒█▒█ ▒█░ ▒█▒█▒█ \n" +
                 "                ▒█▄▀▄█ ▄█▄ ▒█░░▀█ \n\n" +
-                "       (⌐■_■)       " + rating[0][0] + "       (╮°-°)╮┳━━┳ (╯°□°)╯ ┻━━┻ \n\n");
+                "       (⌐■_■)       " + rating[0][0] + "       (╮°-°)╮┳━━┳ (╯°□°)╯ ┻━━┻ \n");
         UI.print.rating.table(rating);
-        System.out.println("Is it time to say good bye? (>﹏<)");
-        UI.input.command();
     }
 
     @Override
@@ -57,7 +52,7 @@ public class Single implements GameMode {
                 "    0 - PC (This machine is stupid, but lucky)\n" +
                 "    1 - Player (Like PC, but on the contrary)\n" +
                 ">>> Make your choice (◕‿◕)");
-        int gameMode = UI.input.mode(2);
+        int gameMode = UI.input.variant(2, "Game mode");
         UI.print.line();
         switch (gameMode) {
             case 0 -> {
@@ -80,7 +75,7 @@ public class Single implements GameMode {
             System.out.println("\nWhat a pity! " + player.getName() + ", your field is empty, let's fill it (ﾉ◕ヮ◕)ﾉ*: ･ﾟ✧");
         }
         Field field = player.getField();
-        while (!field.isStorageEmpty()) {
+        while (field.isStorageAvailable()) {
             field.setBoat(player.getBoat());
         }
         if (player.isHuman()) {
@@ -91,7 +86,6 @@ public class Single implements GameMode {
 
     @Override
     public Object[][] mainLoop() throws UI.input.CommandException {
-        ArrayList<Object[]> result = new ArrayList<>(room.size());
         Player attacking; Player defencing;
         room.start();
         do {
@@ -100,16 +94,15 @@ public class Single implements GameMode {
             int[] action = attacking.getAction(defencing);
             int answer = defencing.attackMe(action);
             attacking.retAnswer(answer);
-            if (!defencing.isAlive()) {
-                result.add(new Object[]{defencing.getName(), defencing.getScore()});
+            if (defencing.isLose()) {
+                room.addLoser(defencing);
                 room.next();
             } else if (answer == 0) {
                 room.next();
                 if (defencing.isHuman()) UI.print.space();
             }
-        } while (result.size() < room.size() - 1);
-        result.add(new Object[]{attacking.getName(), attacking.getScore()});
-        Collections.reverse(result);
-        return result.toArray(Object[][]::new);
+        } while (!room.isFinished());
+        room.addLoser(attacking);
+        return room.getResult();
     }
 }

@@ -1,5 +1,7 @@
 package seaBattle.network;
 
+import seaBattle.elements.Boat;
+import seaBattle.elements.Field;
 import seaBattle.modes.GameMode;
 import seaBattle.players.Player;
 import seaBattle.players.types.UI;
@@ -15,15 +17,18 @@ public class Connection
         extends Thread
         implements seaBattle.network.Socket, GameMode, WebRoom.RoomConnecting
 {
+    private final Server server;
     private final Socket socket;
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
-    private Player player;
+    private WEB player;
     private WebRoom room;
 
-    public Player getPlayer() { return player; }
+    public WEB getPlayer() { return player; }
+    public WebRoom getRoom() { return room; }
 
-    public Connection(Socket socket) throws IOException {
+    public Connection(Server server, Socket socket) throws IOException {
+        this.server = server;
         this.socket = socket;
         this.out = new ObjectOutputStream(this.socket.getOutputStream());
         this.in = new ObjectInputStream(this.socket.getInputStream());
@@ -59,32 +64,15 @@ public class Connection
     public void disconnect() {
         try {
             System.out.println("    Client disconnected: " + this.getName());
-            socket.close();
-            Server.connects.remove(this);
-            interrupt();
-        } catch (IOException e) { throw new DisconnectException(); }
-    }
-
-    @Override
-    public void createRoom(boolean withPsw) {
-
-    }
-
-    @Override
-    public void connectRoom() {
-        send(WebRoom.pack(Server.freeRooms));
-        while (true) {
-            Object[] answer = receiveArray();
-            WebRoom room = Server.freeRooms.getOrDefault(answer[0], null);
-            if (room == null || room.isFull()) send(0);
-            else if (!room.checkPsw((byte[]) answer[1])) send(1);
+            if (room.isFull()) player.lose();
             else {
-                room.connect(this.player);
-                this.room = room;
-                send(2);
-                break;
+                room.popPlayer(player);
+                room.sendAll(player.getName(), "disconnected", room.size() - room.getPlayersIn());
             }
-        }
+            socket.close();
+            server.connects.remove(this);
+            System.gc();
+        } catch (IOException e) { throw new DisconnectException(); }
     }
 
     @Override
@@ -94,8 +82,8 @@ public class Connection
         while (true){
             chooseRoom = (int) receive();
             boolean impossible = switch (chooseRoom) {
-                case 0 -> Server.freeRooms.size() == 0;
-                case 1, 2 -> Server.freeRooms.size() >= Server.MAX_ROOMS;
+                case 0 -> server.freeRooms.size() == 0;
+                case 1 -> server.freeRooms.size() >= Server.MAX_ROOMS;
                 default -> throw new IllegalStateException("Unexpected value: " + chooseRoom);
             };
             if (impossible) deny();
@@ -104,30 +92,87 @@ public class Connection
         allow();
         switch (chooseRoom) {
             case 0 -> connectRoom();
-            case 1 -> createRoom(false);
-            case 2 -> createRoom(true);
+            case 1 -> createRoom();
         }
         findPlayer();
+        fillField(player);
+        Object[][] rating;
+        if (room.isReady()) {
+            rating = mainLoop();
+            room.sendAll((Object) rating);
+        }
     }
 
     @Override
     public Player findPlayer() throws UI.input.CommandException {
-        for (int i = 0; i < room.getPlayersIn(); i++) {
-            room.getConn(i).send(
-                    player.getName(),
-                    "connected",
-                    room.size() - room.getPlayersIn());
-        }
+        room.sendAll(player.getName(), "connected", room.size() - room.getPlayersIn());
         return null;
     }
 
     @Override
     public void fillField(Player player) throws UI.input.CommandException {
-
+        Boat answer;
+        Field field = player.getField();
+        while (true) {
+            answer = (Boat) receive();
+            field.setBoat(answer);
+            if (field.isStorageAvailable()) deny();
+            else break;
+        }
+        allow();
+        ((WEB) player).ready();
     }
+
+    public void fillField() throws UI.input.CommandException { fillField(this.player); }
 
     @Override
     public Object[][] mainLoop() throws UI.input.CommandException {
         return new Object[0][];
     }
+
+
+    @Override
+    public void createRoom() {
+        Object[] answer;
+        // Sending available places
+        send(server.getAvailablePlaces());
+        // Configuring
+        while (true) {
+            answer = receiveArray();
+            boolean withPsw = (3 == answer.length);
+            if (server.freeRooms.containsKey(( String ) answer[0])) deny();
+            else {
+                room = withPsw
+                        ? new WebRoom(player, ( int ) answer[1], ( byte[] ) answer[2])
+                        : new WebRoom(player, ( int ) answer[1]);
+                break;
+            }
+        }
+        allow();
+        server.freeRooms.put(( String ) answer[0], room);
+    }
+
+    @Override
+    public void connectRoom() {
+        WebRoom room;
+        Object[] answer;
+        // Sending available rooms
+        send(WebRoom.pack(server.freeRooms));
+        // Choosing and connecting
+        while (true) {
+            answer = receiveArray();
+            room = server.freeRooms.get((String) answer[0]);
+            if (room.isFull()) {
+                send(0);
+            } else if (room.isLocked() && !room.checkPsw((byte[]) answer[1])) {
+                send(1);
+            } else {
+                send(2);
+                room.connect(this.player);
+                this.room = room;
+                break;
+            }
+        }
+    }
+
 }
