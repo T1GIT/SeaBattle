@@ -3,7 +3,7 @@ package seaBattle;
 import seaBattle.modes.GameMode;
 import seaBattle.modes.types.Multiplayer;
 import seaBattle.modes.types.Single;
-import seaBattle.players.types.*;
+import seaBattle.players.types.UI;
 
 import java.util.InputMismatchException;
 
@@ -45,16 +45,12 @@ public class SeaBattle {
                 default -> throw new IllegalStateException("Unknown game mode " + gameMode);
             };
             // Running
-            UI.print.space();
             game.play(userName);
             // Ended
             System.out.println("Is it time to say good bye? (>﹏<)");
-            while (true) {
-                try { UI.input.command(); }
-                catch (InputMismatchException e) { UI.print.incorrectInput(); }
-            }
+            try { UI.input.command(); }
+            catch (InputMismatchException e) { throw new UI.input.CommandException.Exit(); }
             // Catches commands from user
-            // TODO: Catch com. exceptions in the Multiplayer and close the socket then throw them forward
         } catch (UI.input.CommandException e) {
             String[] name = e.getClass().getCanonicalName().split("\\.");
             switch (name[name.length - 1]) {

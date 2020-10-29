@@ -4,13 +4,15 @@ import seaBattle.elements.Boat;
 import seaBattle.elements.Field;
 import seaBattle.elements.Point;
 import seaBattle.players.Player;
-import seaBattle.rooms.WebRoom;
+import seaBattle.rooms.types.WebRoom;
 
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class UI extends Player {
+public class UI
+        extends Player
+{
     private boolean autoBoat = false;
     private boolean autoAction = false;
 
@@ -26,8 +28,8 @@ public class UI extends Player {
         while (true) {
             try {
                 print.line();
-                print.tableWithStorage(this);
-                System.out.println("\n>>> Input coordinates of your new boat, Your Majesty ... ╰(*´︶`*)╯♡    (r - for random boat, random - for autofilling)");
+                print.field.withStorage(this);
+                System.out.println("\n>>> Input coordinates of your new boat, Your Majesty ... ╰(*´︶`*)╯♡    (r - for random boat, random - for auto filling)");
                 System.out.print("X₁  Y₁  X₂  Y₂ : ");
                 if (autoBoat) {
                     Boat boat = PC.rand.boat(this.field);
@@ -38,7 +40,7 @@ public class UI extends Player {
                 }
                 int[] args;
                 int x1, y1, x2, y2;
-                try { args = input.command(4); }
+                try { args = input.command(); }
                 catch (input.CommandException.RandomBoat e) {  return PC.rand.boat(this.field); }
                 catch (input.CommandException.RandomField e) {
                     this.autoBoat = true;
@@ -82,12 +84,11 @@ public class UI extends Player {
     }
 
     @Override
-    public int[] getAction(Player enemy) throws input.CommandException {
-        final Field enemyField = enemy.getField();
+    public int[] getAction(String enemyName, Field enemyField) throws input.CommandException {
         while (true) {
             try {
                 print.line();
-                print.tableWithEnemy(this, enemy);
+                print.field.withEnemy(this, enemyName, enemyField);
                 System.out.println("\n>>> Input coordinates for attack, Your Majesty ... /(≧▽≦)/");
                 System.out.print("X  Y : ");
                 if (autoAction) {
@@ -97,7 +98,7 @@ public class UI extends Player {
                 }
                 int[] args;
                 int x, y;
-                try { args = input.command(2); }
+                try { args = input.command(); }
                 catch (input.CommandException.RandomBoat e) {  return PC.rand.action(enemyField); }
                 catch (input.CommandException.RandomField e) {
                     this.autoAction = true;
@@ -119,50 +120,53 @@ public class UI extends Player {
 
     @Override
     public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed
+        score[code]++;
         System.out.println(switch (code) {
             case 0 -> "This place is empty (ﾉ>_<)ﾉ";
             case 1 -> "Wow, it was an accurate shot, Sir  w (ﾟｏﾟ)w";
             case 2 -> "Another one kill, congratulations (￣^￣)ゞ";
             default -> throw new IllegalStateException("Unexpected answer code: " + code);
         });
-        score += POINTS_FOR_STATE[code];
     }
 
     public static class print {
         private static final int MARGIN = 10;
         private static final int STORAGE_SHIFT = 6;
 
-        public static void tableWithEnemy(Player me, Player enemy) {
-            final Field enemyField = enemy.getField();
-            String[][] fields = new String[][]{me.getField().getPrinted(me.getName()), enemyField.getPrinted(enemy.getName(), true)};
-            String mar_str = " ".repeat(MARGIN);
-            int[] storage = enemy.getField().getAlives();
-            fields[1][STORAGE_SHIFT] += mar_str + "Alive boats:";
-            for (int i = 0; i < storage.length; i++) {
-                fields[1][i + 2 + STORAGE_SHIFT] += mar_str + storage[i] + " x " + String.valueOf(Point.getStateSign(1)).repeat(i + 1);
+        public static  class field {
+            public static void table(Player me) {
+                String[] field = me.getField().getPrinted(me.getName());
+                String mar_str = String.valueOf(' ').repeat(MARGIN);
+                for (String s : field) System.out.println(mar_str + s);
             }
-            for (int i = 0; i < fields[0].length; i++) {
-                System.out.println(mar_str + fields[0][i] + mar_str + fields[1][i]);
-            }
-        }
 
-        public static void tableWithStorage(Player me) {
-            String[] field = me.getField().getPrinted(me.getName());
-            int[] storage = me.getField().getStorage();
-            String mar_str = String.valueOf(' ').repeat(MARGIN);
-            field[STORAGE_SHIFT] += mar_str + "Available boats:";
-            for (int i = 0; i < storage.length; i++) {
-                field[i + 2 + STORAGE_SHIFT] += mar_str + storage[i] + " x " + String.valueOf(Point.getStateSign(1)).repeat(i + 1);
+            public static void withEnemy(Player me, String enemyName, Field enemyField) {
+                String[][] fields = new String[][]{
+                        me.getField().getPrinted(me.getName()),
+                        enemyField.getPrinted(enemyName)};
+                String mar_str = " ".repeat(MARGIN);
+                int[] storage = enemyField.getAlives();
+                fields[1][STORAGE_SHIFT] += mar_str + "Alive boats:";
+                for (int i = 0; i < storage.length; i++) {
+                    fields[1][i + 2 + STORAGE_SHIFT] += mar_str + storage[i] + " x " + String.valueOf(Point.getStateSign(1)).repeat(i + 1);
+                }
+                for (int i = 0; i < fields[0].length; i++) {
+                    System.out.println(mar_str + fields[0][i] + mar_str + fields[1][i]);
+                }
             }
-            for (String s : field) {
-                System.out.println(mar_str + s);
-            }
-        }
 
-        public static void table(Player me) {
-            String[] field = me.getField().getPrinted(me.getName());
-            String mar_str = String.valueOf(' ').repeat(MARGIN);
-            for (String s : field) System.out.println(mar_str + s);
+            public static void withStorage(Player me) {
+                String[] field = me.getField().getPrinted(me.getName());
+                int[] storage = me.getField().getStorage();
+                String mar_str = String.valueOf(' ').repeat(MARGIN);
+                field[STORAGE_SHIFT] += mar_str + "Available boats:";
+                for (int i = 0; i < storage.length; i++) {
+                    field[i + 2 + STORAGE_SHIFT] += mar_str + storage[i] + " x " + String.valueOf(Point.getStateSign(1)).repeat(i + 1);
+                }
+                for (String s : field) {
+                    System.out.println(mar_str + s);
+                }
+            }
         }
 
         public static void space() {
@@ -195,17 +199,16 @@ public class UI extends Player {
                 System.out.println();
             }
 
-            public static void table(Object[][] rating) {
-                final boolean WITH_HAT = false;
+            public static void table(Object[][] rating) { // TODO: remove score. Add kills, wounds, passes
+                Object[] row;
+                final boolean WITH_HAT = true;
                 int margin = (Player.MAX_NAME_LENGTH) / 2;
                 System.out.println("\n" + " ".repeat(margin - 2) + "ＳＣＯＲＥ ＢＯＡＲＤ\n");
-                if (WITH_HAT) System.out.println("PLACE" + " ".repeat(margin) + "NAME" + " ".repeat(margin) + "POINTS");
-                int points; String name;
+                if (WITH_HAT) System.out.println("PLACE" + " ".repeat(margin) + "NAME" + " ".repeat(margin) + "KILLS  WOUNDS  PASSES");
                 for (int i = 0, place = 1; i < rating.length; i++, place++) {
-                    name = (String) rating[i][0];
-                    points = (int) rating[i][1];
-                    System.out.printf("%5d  %-" + (Player.MAX_NAME_LENGTH) + "s  %-6d\n",
-                            place, name, points);
+                    row = rating[i];
+                    System.out.printf("%5d  %-" + (Player.MAX_NAME_LENGTH) + "s  %-6s %-7s %s\n",
+                            place, row[0], row[1], row[2], row[3]);
                 }
                 System.out.println();
             }
@@ -219,20 +222,19 @@ public class UI extends Player {
             CommandException() {}
             CommandException(String msg) { super(msg); }
 
-            public static class Exit extends CommandException {}
-            public static class Reset extends CommandException {}
-            public static class RandomBoat extends CommandException {}
-            public static class RandomField extends CommandException {}
-            public static class AddRoom extends CommandException {}
-            public static class Chat extends CommandException {public Chat(String msg) {super(msg);}}
+            public final static class Exit extends CommandException {}
+            public final static class Reset extends CommandException {}
+            public final static class RandomBoat extends CommandException {}
+            public final static class RandomField extends CommandException {}
+            public final static class Chat extends CommandException {public Chat(String msg) {super(msg);}}
         }
 
         public static int variant(int amountOfVariants, String phrase) throws CommandException {
             while (true) {
                 try {
                     System.out.print(phrase + ": ");
-                    int res = input.command(1)[0];
-                    if (res >= amountOfVariants || res < 0) System.out.println("Can't find this answer");
+                    int res = input.command()[0];
+                    if (res >= amountOfVariants || res < 0) System.out.println("          Can't find this answer");
                     else return res;
                 } catch (InputMismatchException e) { print.incorrectInput(); }
             }
@@ -242,9 +244,9 @@ public class UI extends Player {
             while (true) {
                 try {
                     System.out.print("Amount: ");
-                    int res = input.command(1)[0];
-                    if (res > maxPlayers) System.out.println("Players amount can't be more then " + maxPlayers);
-                    else if (res < 2) System.out.println("At least 2 players should participate");
+                    int res = input.command()[0];
+                    if (res > maxPlayers) System.out.println("          Players amount can't be more then " + maxPlayers);
+                    else if (res < 2) System.out.println("          At least 2 players should participate");
                     else return res;
                 } catch (InputMismatchException e) { print.incorrectInput(); }
             }
@@ -253,9 +255,11 @@ public class UI extends Player {
         public static String roomName() {
             while (true) {
                 System.out.print("Room name: ");
-                String res = new Scanner(System.in).nextLine();
+                String res = new Scanner(System.in).nextLine().strip();
                 if (res.length() > WebRoom.MAX_NAME_LENGTH) {
                     System.out.println("          Unfortunately, this name is too long (maximum length is " + WebRoom.MAX_NAME_LENGTH + " symbols)");
+                } else if (res.length() == 0) {
+                    System.out.println("          Name should include at least 1 symbol");
                 } else return res;
             }
         }
@@ -263,7 +267,7 @@ public class UI extends Player {
         public static String playerName() {
             while (true) {
                 System.out.print("Name: ");
-                String res = new Scanner(System.in).nextLine();
+                String res = new Scanner(System.in).nextLine().strip();
                 if (res.length() > Player.MAX_NAME_LENGTH) {
                     System.out.println("          Unfortunately, this name is too long (maximum length is " + Player.MAX_NAME_LENGTH + " symbols)");
                 } else if (res.length() == 0) {
@@ -276,9 +280,9 @@ public class UI extends Player {
             String psw;
             while (true) {
                 System.out.print("Password: ");
-                psw = new Scanner(System.in).nextLine();
+                psw = new Scanner(System.in).nextLine().strip();
                 if (psw.length() > WebRoom.security.MAX_PSW_LEN) {
-                    System.out.println("Password can't be longer then " + WebRoom.security.MAX_PSW_LEN);
+                    System.out.println("          Password can't be longer then " + WebRoom.security.MAX_PSW_LEN);
                 } else if (psw.length() < WebRoom.security.MIN_PSW_LEN) {
                     System.out.println("Password can't be shorter then " + WebRoom.security.MIN_PSW_LEN);
                 } else break;
@@ -286,9 +290,7 @@ public class UI extends Player {
             return WebRoom.security.hash(psw);
         }
 
-        public static void command() throws CommandException { command(0); }
-
-        public static int[] command(int argsAmount) throws CommandException {
+        public static int[] command() throws CommandException {
             String[] cmd = new Scanner(System.in).nextLine().toLowerCase().strip().split("\\s+");
             switch (cmd[0]) {
                 case "reset" -> throw new CommandException.Reset();
@@ -297,10 +299,9 @@ public class UI extends Player {
                 case "random" -> throw new CommandException.RandomField();
                 case "chat" -> throw new CommandException.Chat(String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length)));
                 default -> {
-                    if (cmd.length != argsAmount) throw new InputMismatchException();
-                    int[] args = new int[argsAmount];
+                    int[] args = new int[cmd.length];
                     try {
-                        for (int i = 0; i < argsAmount; i++) args[i] = Integer.parseInt(cmd[i]);
+                        for (int i = 0; i < cmd.length; i++) args[i] = Integer.parseInt(cmd[i]);
                     } catch (NumberFormatException e) { throw new InputMismatchException(); }
                     return args;
                 }

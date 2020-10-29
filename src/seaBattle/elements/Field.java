@@ -2,15 +2,16 @@ package seaBattle.elements;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
-public class Field implements Serializable {
-    final public static byte SIZE = 10;
-    final public static byte MAX_BOAT_LENGTH = 4;
-    final private Point[][] table;
-    final private int[] unusedBoats;
-    final private int[] aliveBoats;
+public class Field
+        implements Serializable, Cloneable
+{
+    public final static byte SIZE = 10;
+    public final static byte MAX_BOAT_LENGTH = 4;
+    private int[] unusedBoats;
+    private int[] aliveBoats;
+    private Point[][] table;
 
     public Point getPoint(int[] coor) {
         return table[coor[1]][coor[0]];
@@ -36,13 +37,9 @@ public class Field implements Serializable {
         this.table = new Point[SIZE][SIZE];
         this.unusedBoats = new int[MAX_BOAT_LENGTH];
         this.aliveBoats = new int[MAX_BOAT_LENGTH];
+        for (Point[] row: table) for (int i = 0; i < SIZE; i++) row[i] = new Point();
         for (int i = 0; i < MAX_BOAT_LENGTH; i++) this.unusedBoats[i] = MAX_BOAT_LENGTH - i;
         for (int i = 0; i < MAX_BOAT_LENGTH; i++) this.aliveBoats[i] = 0;
-        for (int y = 0; y < SIZE; y++) {
-            for (int x = 0; x < SIZE; x++) {
-                this.table[y][x] = new Point();
-            }
-        }
     }
 
     public boolean placeIsEmpty(int x1, int y1, int x2, int y2) {
@@ -62,8 +59,6 @@ public class Field implements Serializable {
         return placeIsEmpty(p1[0], p1[1], p2[0], p2[1]);
     }
 
-    public boolean placeIsEmpty(Boat boat) { return placeIsEmpty(boat.getxPos(), boat.getyPos()); }
-
     public boolean hasInStorage(int length) {
         return unusedBoats[length - 1] > 0;
     }
@@ -74,8 +69,8 @@ public class Field implements Serializable {
     }
 
     public boolean isDead() {
-        for (int am : aliveBoats) if (am == 0) return true;
-        return false;
+        for (int am : aliveBoats) if (am != 0) return false;
+        return true;
     }
 
     /**
@@ -171,7 +166,25 @@ public class Field implements Serializable {
         return boatPoints.toArray(Point[]::new);
     }
 
-    public String[] getPrinted(String name, Boolean hidden) {
+    public Field getSecured() {
+        Field secured = null;
+        int state;
+        try {
+            secured = (Field) this.clone();
+            secured.table = new Point[SIZE][SIZE];
+            secured.aliveBoats = this.aliveBoats.clone();
+            secured.unusedBoats = this.unusedBoats.clone();
+            for (int row = 0; row < SIZE; row++) {
+                for (int col = 0; col < SIZE; col++) {
+                    state = this.table[row][col].getState();
+                    secured.table[row][col] = new Point(state == 1 ? 0 : state);
+                }
+            }
+        } catch (CloneNotSupportedException e) { e.printStackTrace(); }
+        return secured;
+    }
+
+    public String[] getPrinted(String name) {
         final int LINE_LEN = SIZE * 3;
         int leftAlign = (LINE_LEN + 8 - name.length()) / 2;
         int rightAlign = LINE_LEN + 8 - leftAlign - name.length();
@@ -188,19 +201,12 @@ public class Field implements Serializable {
         for (int row = 0; row < SIZE; row++) {
             StringBuilder str = new StringBuilder();
             str.append("┃  ").append(row).append("  ┃ ");
-            for (int col = 0; col < SIZE; col++) {
-                char symbol = table[row][col].draw();
-                if (table[row][col].isAlive() && hidden) symbol = Point.getStateSign(0);
-                str.append(" ").append(symbol).append(" ");
-            }
+            for (int col = 0; col < SIZE; col++)
+                str.append(" ").append(table[row][col].draw()).append(" ");
             str.append(" ┃");
             res[5 + row] = str.toString();
         }
         res[SIZE + 5] = "┗ ━━━ ┻ " + "━━ ".repeat(LINE_LEN / 3) + "━┛";
         return res;
-    }
-
-    public String[] getPrinted(String name) {
-        return getPrinted(name, false);
     }
 }

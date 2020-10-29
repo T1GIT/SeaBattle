@@ -2,9 +2,9 @@ package seaBattle.tests;
 
 
 import org.junit.jupiter.api.Test;
-import seaBattle.rooms.WebRoom;
+import seaBattle.rooms.types.WebRoom;
 
-class WebRoomTest {
+class RoomTest {
     @Test
     void checkPsw() {
         WebRoom room = new WebRoom(null, 2, WebRoom.security.hash("1234"));

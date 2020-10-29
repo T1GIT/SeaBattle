@@ -2,7 +2,9 @@ package seaBattle.elements;
 
 import java.io.Serializable;
 
-public class Boat implements Serializable {
+public class Boat
+        implements Serializable
+{
     final private byte[] xPos;
     final private byte[] yPos;
     private byte wounds = 0;
@@ -17,13 +19,10 @@ public class Boat implements Serializable {
     public Boat(int[] point1, int[] point2) {
         this(point1[0], point1[1], point2[0], point2[1]);
     }
-    public Boat(int[] coors) { this(coors[0], coors[1], coors[2], coors[3]); }
 
     public int[] getxPos() { return new int[]{xPos[0], xPos[1]}; }
 
     public int[] getyPos() { return new int[]{yPos[0], yPos[1]}; }
-
-    public int getWounds() { return this.wounds; }
 
     public int length() { return Math.max(xPos[1] - xPos[0], yPos[1] - yPos[0]) + 1; }
 

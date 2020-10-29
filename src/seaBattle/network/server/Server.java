@@ -1,11 +1,11 @@
-package seaBattle.network;
+package seaBattle.network.server;
 
-import seaBattle.rooms.WebRoom;
+import seaBattle.network.Socket;
+import seaBattle.rooms.types.WebRoom;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -35,7 +35,7 @@ public class Server extends Thread{
                 Connection connection = new Connection(this, serverSocket.accept());
                 if (connects.size() >= MAX_CONNECTS) {
                     System.out.print("    Client discarded: ");
-                    connection.disconnect();
+                    try { connection.disconnect(); } catch (Socket.DisconnectException ignored) {}
                 } else {
                     System.out.println("    Client connected: " + connection.getName());
                     connects.add(connection);

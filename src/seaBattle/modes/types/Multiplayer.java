@@ -3,25 +3,27 @@ package seaBattle.modes.types;
 import seaBattle.elements.Boat;
 import seaBattle.elements.Field;
 import seaBattle.modes.GameMode;
-import seaBattle.network.Client;
 import seaBattle.network.Socket;
+import seaBattle.network.client.Client;
 import seaBattle.players.Player;
+import seaBattle.players.types.PC;
 import seaBattle.players.types.UI;
-import seaBattle.rooms.WebRoom;
+import seaBattle.rooms.types.WebRoom;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Multiplayer
         implements GameMode, WebRoom.RoomConnecting
 {
     private final Client client = new Client();
-    private UI player;
+    private Player player;
 
     @Override
     public void play(String userName) throws UI.input.CommandException {
         try {
-            this.player = new UI(userName);
+            this.player = userName.toLowerCase().equals("pc")
+                    ? new PC()
+                    : new UI(userName);
             UI.print.line();
             System.out.println("             Welcome to ＭＵＬＴＩＰＬＡＹＥＲ　ＭＯＤＥ, Dear " + player.getName() + "! ヽ(・∀・)ﾉ");
             UI.print.line();
@@ -50,11 +52,14 @@ public class Multiplayer
                 case 1 -> createRoom();
             }
             findPlayer();
+            System.out.println("Yahoo, all of the members are connected. Let's get started!");
+            UI.print.line();
             fillField(player);
-            client.receive();
-            System.out.println("        Game starts now! o(>ω<)o");
-            Object [][] rating;
-            rating = mainLoop();
+            UI.print.line();
+            System.out.println("    Wait when the other players become ready ... \uD83D\uDC22");
+            client.receive(); // Ready
+            System.out.println("\n\n        Three ... two ... one ... FIGHT! o(>ω<)o");
+            Object [][] rating = mainLoop();
             UI.print.rating.table(rating);
         } catch (Socket.DisconnectException e) {
             System.out.println("There was a problem on the server. You were disconnected w(ﾟｏﾟ)w");
@@ -80,21 +85,53 @@ public class Multiplayer
 
     @Override
     public void fillField(Player player) throws UI.input.CommandException {
-        System.out.println("\nWhat a pity! " + player.getName() + ", your field is empty, let's fill it (ﾉ◕ヮ◕)ﾉ*: ･ﾟ✧");
-        Field field = player.getField();
         Boat boat;
+        System.out.println("\nWhat a pity! " + player.getName() + ", your field is empty, let's fill it (〜￣△￣)〜");
+        Field field = player.getField();
         do {
             boat = player.getBoat();
-            field.setBoat(boat); // TODO: Unsafe. Add checking in server
+            field.setBoat(boat);
             client.send(boat);
         } while (client.isDenied());
         System.out.println("Wow, you're The God of War, " + player.getName() + "! (✯◡✯)");
-        UI.print.table(player);
+        UI.print.field.table(player);
     }
 
     @Override
     public Object[][] mainLoop() throws UI.input.CommandException {
-        return null;
+        Object[] answer;
+        int[] coor;
+        int code;
+        loop:
+        while (true) {
+            answer = client.receiveArray();
+            switch ((int) answer[0]) {
+                case 0: // Attack
+                    while (true) {
+                        try {
+                            coor = player.getAction((String) answer[1], (Field) answer[2]);
+                            break;
+                        } catch (UI.input.CommandException.Chat chat) {
+                            client.send("chat", chat.getMessage());
+                            client.receive();
+                        }
+                    }
+                    client.send(coor);
+                    code = (int) client.receive();
+                    player.retAnswer(code);
+                    break;
+                case 1: // Defencing
+                    coor = (int[]) answer[1];
+                    player.attackMe(coor);
+                    break;
+                case 2: // Losing
+                    break loop;
+                case 3: // Chat
+                    System.out.println(answer[1]);
+                    break;
+            }
+        }
+        return (Object[][]) client.receive();
     }
 
     @Override

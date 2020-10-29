@@ -1,13 +1,17 @@
 package seaBattle.players.types;
 
 import seaBattle.elements.Boat;
-import seaBattle.network.Connection;
+import seaBattle.elements.Field;
+import seaBattle.network.server.Connection;
 import seaBattle.players.Player;
 
 
-public class WEB extends Player {
+public class WEB
+        extends Player
+{
     private final Connection conn;
-    private boolean ready;
+    private PC bot = null; // TODO: Make bot changing system
+    private boolean ready = false;
 
     public Connection getConn() { return conn; }
 
@@ -18,31 +22,49 @@ public class WEB extends Player {
 
     @Override
     public boolean isHuman() {
-        return true;
+        return bot == null;
     }
 
     @Override
     public Boat getBoat() {
-        Object[] raw = (Object[]) conn.receive();
-        int[] coors = new int[4];
-        for (int i = 0; i < raw.length; i++) coors[i] = (int) raw[i];
-        return new Boat(coors);
+        Boat boat;
+        if (isHuman()) {
+            boat = (Boat) conn.receive();
+        } else {
+            boat = PC.rand.boat(field);
+        }
+        return boat;
     }
 
     @Override
-    public int[] getAction(Player enemy) {
-        Object[] raw = (Object[]) conn.receive();
-        int[] coor = new int[2];
-        for (int i = 0; i < raw.length; i++) coor[i] = (int) raw[i];
-        return coor;
+    public int[] getAction(String enemyName, Field enemyField) {
+        int[] action;
+        if (isHuman()) {
+            conn.send(0, enemyName, enemyField);
+            action = (int[]) conn.receive();
+        } else {
+            action = bot.getAction(enemyName, enemyField);
+        }
+        return  action;
+    }
+
+    @Override
+    public int attackMe(int[] coor) {
+        conn.send(1, coor);
+        return super.attackMe(coor);
     }
 
     @Override
     public void retAnswer(int code) {
-        conn.send(code);
+        score[code]++;
+        if (isHuman()) {
+            conn.send(code);
+        } else {
+            bot.retAnswer(code);
+        }
     }
 
-    public void lose() { this.lose = true; }
+    public void toBot() { this.bot = new PC(); }
 
     public void ready() { this.ready = true; }
 

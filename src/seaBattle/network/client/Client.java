@@ -1,4 +1,6 @@
-package seaBattle.network;
+package seaBattle.network.client;
+
+import seaBattle.network.server.Server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,26 +34,32 @@ public class Client implements seaBattle.network.Socket {
     @Override
     public void send(Object data) throws DisconnectException {
         try {
-            out.writeObject((Object) data);
+            out.writeObject(data);
         } catch (IOException e) { throw new DisconnectException(); }
     }
 
     @Override
     public Object receive() throws DisconnectException {
-        Object res = null;
+        Object data = null;
         try {
-            do {
-                res = in.readObject();
-            } while (res == null);
+            data = in.readObject();
             try {
-                if (((Object[]) res)[0].equals("chat")) {
-                    System.out.println(((Object[]) res)[1]);
-                    return receive();
+                Object[] objArr = (Object[]) data;
+                String status = (String) objArr[0];
+                switch (status) {
+                    case "chat" -> {
+                        System.out.println("Chat: " + objArr[1]);
+                        return receive();
+                    }
+                    case "sys" -> {
+                        System.out.println(objArr[1]);
+                        return receive();
+                    }
                 }
             } catch (ClassCastException ignored) { }
         } catch (ClassNotFoundException e) { e.printStackTrace();
         } catch (IOException e) { throw new DisconnectException(); }
-        return res;
+        return data;
     }
 
     @Override

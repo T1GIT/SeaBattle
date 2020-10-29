@@ -4,33 +4,32 @@ import seaBattle.elements.Field;
 import seaBattle.players.types.UI;
 
 
-public abstract class Player {
+public abstract class Player
+{
     public final static int MAX_NAME_LENGTH = Field.SIZE * 3 + 8;
-    /**
-     * Points for actions
-     * 0: for passing
-     * 1: for wounding
-     * 2: for killing
-     * 3: for checking losing
-     */
-    protected final static int[] POINTS_FOR_STATE = new int[]{-1, 1, 2, 1};
-    protected final Field field;
     private final String name;
-    protected int score = 0;
-    protected boolean lose = false;
+    protected final Field field;
+    /**
+     * {@code score} contains player's statistics:
+     *      0 - passes
+     *      1 - wounds
+     *      2 - kills
+     */
+    protected final byte[] score;
 
-    public Field getField() { return this.field; }
-    public String getName() { return this.name; }
-    public int getScore() { return this.score; }
+    public Field getField() { return field; }
+    public String getName() { return name; }
+    public byte[] getScore() { return score; }
 
     /**
-     * Constructs Player
-     * @param name player's name
+     * Constructs Player.
+     * @param name player's name.
      */
     public Player(String name) {
         assert (name.length() <= MAX_NAME_LENGTH): "Given name longer then available: " + name;
         this.field = new Field();
         this.name = name;
+        this.score = new byte[]{0, 0, 0};
     }
 
     /**
@@ -40,40 +39,36 @@ public abstract class Player {
      *      1 - wounded
      *      2 - killed
      */
-    public int attackMe(int[] coor) {
-        int answer = this.field.attack(coor[0], coor[1]);
-        this.lose = field.isDead();
-        return answer;
-    }
+    public int attackMe(int[] coor) { return this.field.attack(coor[0], coor[1]); }
 
     /**
-     * @return True if player have no alive boat on its field
+     * @return True if player have no alive boat on its field.
      */
-    public boolean isLose() {
-        this.score += POINTS_FOR_STATE[3];
-        return lose;
-    }
+    public boolean isLose() { return field.isDead(); }
 
     /**
-     * @return True if player isn't {@code PC}
+     * @return True if player isn't {@code PC}.
      */
     public abstract boolean isHuman();
 
     /**
-     * @return answer for boat's coordinates request from console
-     * @throws UI.input.CommandException if user typed command
+     * @return answer for boat's coordinates.
+     * @throws UI.input.CommandException if user typed command.
      */
     public abstract Boat getBoat() throws UI.input.CommandException;
 
     /**
-     * @param enemy another player
-     * @return answer for attack's coordinates request from console
-     * @throws UI.input.CommandException if user typed command
+     * @param enemyName defencing player's name.
+     * @param enemyField defencing player's field.
+     * @return answer for attack's coordinates.
+     * @throws UI.input.CommandException if user typed command.
      */
-    public abstract int[] getAction(Player enemy) throws UI.input.CommandException;
+    public abstract int[] getAction(String enemyName, Field enemyField) throws UI.input.CommandException;
 
     /**
-     * Returns answer to player
+     * Returns answer to player.
+     * Writes into {@code score} result.
+     * MUST TO BE OVERRIDING
      * @param code of answer from {@code field.attack()}
      *      0 - passed
      *      1 - wounded

@@ -1,40 +1,36 @@
-package seaBattle.rooms;
+package seaBattle.rooms.types;
 
-import seaBattle.network.Connection;
-import seaBattle.network.Server;
+import seaBattle.network.server.Connection;
 import seaBattle.players.Player;
 import seaBattle.players.types.WEB;
+import seaBattle.rooms.Room;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-public class WebRoom extends Room {
+public class WebRoom extends Room<WEB> {
     public final static int MAX_NAME_LENGTH = 30;
-    private byte[] psw;
+    private final byte[] psw;
 
-    public WebRoom(WEB player, int size) {
+    public WebRoom(WEB player, int size) { this(player, size, null); }
+
+    public WebRoom(WEB player, int size, byte[] psw) {
         super(size);
+        this.psw = psw;
         this.connect(player);
     }
 
-    public WebRoom(WEB player, int size, byte[] psw) {
-        this(player, size);
-        this.psw = psw;
-    }
-
-    public Connection getConn(int index) { return ((WEB) this.getPlayer(index)).getConn(); }
+    public Connection getConn(int index) { return this.getPlayer(index).getConn(); }
 
     public boolean isLocked() { return this.psw != null; }
 
     public boolean checkPsw(byte[] inPsw) { return security.checkPsw(this.psw, inPsw); }
 
-    public void popPlayer(WEB player) {
-        for (int i = players.indexOf(player); i < players.size(); i++) {
-            players.set(i, players.get(i + 1));
-        }
-    }
+    public void popPlayer(WEB player) { players.remove(player); }
 
     public static HashMap<String, Object[]> pack(HashMap<String, WebRoom> rooms) {
         HashMap<String, Object[]> res = new HashMap<>(rooms.size());
@@ -66,17 +62,36 @@ public class WebRoom extends Room {
     }
 
     public boolean isReady() {
-        for (Player player: players) {
-            if (!((WEB) player).isReady()) return false;
-        }
+        for (WEB player: players) if (!player.isReady()) return false;
         return true;
     }
 
-    public void sendAll(Object ... pack) {
-        for(Player player: players) {
-            ((WEB) player).getConn().send(pack);
+    public boolean humanIsHere() {
+        for (WEB player: players) if (player.isHuman()) return true;
+        return false;
+    }
+
+    @Override
+    public void addLoser(WEB player) {
+        player.getConn().send(2, null);
+        super.addLoser(player);
+    }
+
+    public void sendAll(Object obj) {
+        for(WEB player: players) {
+            if (player.isHuman()) player.getConn().send(obj);
         }
     }
+
+    public void sendAll(Object ... pack) { sendAll((Object) pack); }
+
+//    public void wakeUp() {
+//        for (WEB player: players) {
+//            synchronized (player.getConn()) {
+//                notifyAll();
+//            }
+//        }
+//    }
 
     public static class security {
         public final static int MAX_PSW_LEN = 100;
@@ -86,9 +101,7 @@ public class WebRoom extends Room {
             try {
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
                 return digest.digest(str.getBytes(StandardCharsets.UTF_8));
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
+            } catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
             return null;
         }
 

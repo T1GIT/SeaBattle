@@ -1,7 +1,5 @@
 package seaBattle.network;
 
-import java.io.IOException;
-
 public interface Socket {
 
     /**
@@ -57,5 +55,5 @@ public interface Socket {
     /**
      * Raised if socket was closed. Suitable for safe socket closing
      */
-    public class DisconnectException extends RuntimeException {}
+    class DisconnectException extends RuntimeException {}
 }

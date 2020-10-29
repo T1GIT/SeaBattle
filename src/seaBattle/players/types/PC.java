@@ -1,13 +1,17 @@
 package seaBattle.players.types;
 
-import seaBattle.elements.*;
+import seaBattle.elements.Boat;
+import seaBattle.elements.Field;
+import seaBattle.elements.Point;
 import seaBattle.players.Player;
 
 import java.util.Random;
 
 
-public class PC extends Player {
-    private boolean lastWounded = false;
+public class PC
+        extends Player
+{
+    private int woundedBefore = 0;
     private int[] lastWoundCoor;
     private int[] lastHitCoor;
 
@@ -20,20 +24,18 @@ public class PC extends Player {
     public Boat getBoat() { return rand.boat(this.field); }
 
     @Override
-    public  int[] getAction(Player enemy) {
+    public  int[] getAction(String enemyName, Field enemyField) {
         int[] coor;
-        Field enemyField = enemy.getField();
-        if (lastWounded) {
-            Boat woundedBoat = enemyField.getPoint(this.lastWoundCoor).getBoat();
+        if (woundedBefore > 0) {
             int x = this.lastWoundCoor[0]; int y = this.lastWoundCoor[1];
-            if (woundedBoat.getWounds() > 1) {  // Have >= 2 wounded points of boat
+            if (woundedBefore > 1) {  // Have >= 2 wounded points of boat
                 Point point;
                 int direction;
                 try {
                     direction = findWoundDirection(enemyField);
                 } catch (AssertionError assertionError) {
-                    this.lastWounded = false;
-                    return getAction(enemy);
+                    woundedBefore = 0;
+                    return getAction(enemyName, enemyField);
                 }
                 boolean hor_axis = direction % 2 == 0;
                 int step = - direction + (hor_axis ? 1 : 2);
@@ -42,13 +44,13 @@ public class PC extends Player {
                     y = hor_axis ? y + step : y;
                     if (Field.isOver(x, y)) {
                         step = -step;
-                        x = this.lastWoundCoor[0]; y = this.lastWoundCoor[1];
+                        x = lastWoundCoor[0]; y = lastWoundCoor[1];
                     }
                     point = enemyField.getPoint(x, y);
                     if (point.isPassed()) {
                         step = -step;
-                        x = this.lastWoundCoor[0]; y = this.lastWoundCoor[1];
-                    } else if (!point.isWounded()) {
+                        x = lastWoundCoor[0]; y = lastWoundCoor[1];
+                    } else if (point.isAttackable()) {
                         coor = new int[]{x, y};
                         break;
                     }
@@ -75,15 +77,19 @@ public class PC extends Player {
 
     @Override
     public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed
+        score[code]++;
         switch (code) {
+            case 0 -> {}
             case 1 -> {
-                lastWounded = true;
+                woundedBefore++;
                 lastWoundCoor = lastHitCoor;
             }
-            case 0, 2 -> lastWounded = false;
+            case 2 -> {
+                woundedBefore = 0;
+                lastWoundCoor = null;
+            }
             default -> throw new IllegalStateException("Unexpected answer code: " + code);
         }
-        score += POINTS_FOR_STATE[code];
     }
 
     private int findWoundDirection(Field field) throws AssertionError {
@@ -116,18 +122,9 @@ public class PC extends Player {
             return new int[]{x, y};
         }
 
-        public static int choice(int one, int two) {
-            return bool() ? one : two;
-        }
-
         public static Boat boat(Field field) {
-            int len = 0;
-            for (int i = Field.MAX_BOAT_LENGTH; i > 0; i--)
-                if (field.hasInStorage(i)) {
-                    len = i;
-                    break;
-                }
-            assert (len != 0) : "Storage is empty";
+            int len = Field.MAX_BOAT_LENGTH;
+            for (; len > 0; len--) if (field.hasInStorage(len)) break;
             while (true) {
                 boolean rotation = rand.bool();
                 int[] point1 = rand.coor(len);

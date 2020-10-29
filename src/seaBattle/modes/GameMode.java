@@ -1,7 +1,7 @@
 package seaBattle.modes;
 
 import seaBattle.players.Player;
-import seaBattle.players.types.*;
+import seaBattle.players.types.UI;
 
 
 public interface GameMode {
