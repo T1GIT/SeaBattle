@@ -112,16 +112,9 @@ public class Connection
         player.ready();
         if (room.isReady()) {
             server.freeRooms.remove(roomName);
-//            room.wakeUp();
             room.sendAll(0);
             Object[][] rating = mainLoop();
-            room.sendAll((Object) rating);
-        } else {
-//            try {
-//                synchronized (this) {
-//                    wait();
-//                }
-//            } catch (InterruptedException e) { e.printStackTrace(); }
+            room.sendAll(( Object ) rating);
         }
     }
 

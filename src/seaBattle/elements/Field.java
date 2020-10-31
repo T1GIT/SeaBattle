@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 
+/**
+ * Model of the user's table. Holding array of {@code Point}s.
+ */
 public class Field
         implements Serializable, Cloneable
 {
@@ -42,6 +45,11 @@ public class Field
         for (int i = 0; i < MAX_BOAT_LENGTH; i++) this.aliveBoats[i] = 0;
     }
 
+    /**
+     * Checks if area {@code x1, y1, x2, y2} doesn't have engaged points
+     * @param x1 x2 x3 x4 coordinates of the area
+     * @return True if given area is empty
+     */
     public boolean placeIsEmpty(int x1, int y1, int x2, int y2) {
         x1 = Math.max(0, x1 - 1);
         x2 = Math.min(x2 + 1, SIZE - 1);
@@ -59,15 +67,27 @@ public class Field
         return placeIsEmpty(p1[0], p1[1], p2[0], p2[1]);
     }
 
+    /**
+     * Checks having boat of {@code length}
+     * @return True if boat of {@code length} can be setted on this field
+     */
     public boolean hasInStorage(int length) {
         return unusedBoats[length - 1] > 0;
     }
 
+    /**
+     * Checks having boats to set
+     * @return True if boat can be setted on this field
+     */
     public boolean isStorageAvailable() {
         for (int am : unusedBoats) if (am != 0) return true;
         return false;
     }
 
+    /**
+     * Checks if {@code Field} can't be attacked.
+     * @return True if it doesn't have alive boats.
+     */
     public boolean isDead() {
         for (int am : aliveBoats) if (am != 0) return false;
         return true;
@@ -110,7 +130,6 @@ public class Field
 
     /**
      * Places boat in the field without any checks
-     *
      * @param boat for placing
      */
     public void setBoat(Boat boat) {
@@ -166,6 +185,10 @@ public class Field
         return boatPoints.toArray(Point[]::new);
     }
 
+    /**
+     * Creates new {@code Field} without alive boats.
+     * Suitable for safe sending of the field.
+     */
     public Field getSecured() {
         Field secured = null;
         int state;
@@ -184,6 +207,10 @@ public class Field
         return secured;
     }
 
+    /**
+     * @param name of the field's owner
+     * @return array of {@code String}s, ready for printing via {@code System.out.println()}.
+     */
     public String[] getPrinted(String name) {
         final int LINE_LEN = SIZE * 3;
         int leftAlign = (LINE_LEN + 8 - name.length()) / 2;

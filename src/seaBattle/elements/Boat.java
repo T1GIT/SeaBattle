@@ -2,6 +2,9 @@ package seaBattle.elements;
 
 import java.io.Serializable;
 
+/**
+ * Class, holding information about boat: coordinates, lifes.
+ */
 public class Boat
         implements Serializable
 {

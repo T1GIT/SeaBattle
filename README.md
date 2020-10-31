@@ -12,5 +12,7 @@ In **multiplayer mode** you can connect with another
 players via the virtual rooms
 
 
-##### Dmitriy Derbin 
-######PI19-5
+### Dmitriy Derbin 
+#### PI19-5
+#####Version 1.0
+31.10.2020

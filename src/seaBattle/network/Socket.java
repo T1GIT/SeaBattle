@@ -1,5 +1,11 @@
 package seaBattle.network;
 
+/**
+ * Classes implemented {@code Socket} are two sides
+ * of the socket connects.
+ * Interface includes base operations of exchanging
+ * data.
+ */
 public interface Socket {
 
     /**

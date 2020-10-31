@@ -85,14 +85,6 @@ public class WebRoom extends Room<WEB> {
 
     public void sendAll(Object ... pack) { sendAll((Object) pack); }
 
-//    public void wakeUp() {
-//        for (WEB player: players) {
-//            synchronized (player.getConn()) {
-//                notifyAll();
-//            }
-//        }
-//    }
-
     public static class security {
         public final static int MAX_PSW_LEN = 100;
         public final static int MIN_PSW_LEN = 4;

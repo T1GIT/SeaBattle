@@ -2,6 +2,10 @@ package seaBattle.elements;
 
 import java.io.Serializable;
 
+/**
+ * Class of {@code Field}'s elements. Holding state
+ * of the point and boat, been in there.
+ */
 public class Point
         implements Serializable
 {

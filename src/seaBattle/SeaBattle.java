@@ -8,6 +8,36 @@ import seaBattle.players.types.UI;
 import java.util.InputMismatchException;
 
 
+/**
+ * The Java realisation of the game Battleship.
+ * 
+ * <p>Game going through players in the room. The room may
+ *  contains 2 or more players. If the room includes more
+ *  then 2 players than game going through cyclic. Example:
+ *  We have room with 3 players: A, B, C.
+ *  Games looks so:
+ *  1. A attacks B
+ *  2. B attacks C
+ *  3. C attacks A
+ *  ... again in the same way
+ *  When one of them won't have alive boats he'll lose
+ *  and skipped. Player before them will attack next
+ *  player. Game continues while all players almost one
+ *  will lose.
+ *
+ * <p>This game provides two types of player: PC and UI.
+ * You can choose every player whom it can be.
+ *
+ * <p>You can play via the internet. And you can secure
+ * your room with password. In web mode you can chat
+ * with all competitors. Just type "chat <message>"
+ * when coordinates for attack was requested. And in any
+ * mode you can make your computer play for you, for
+ * that you should call yourself "PC".
+ *
+ * @author T1MON
+ * @version 1.0
+ */
 public class SeaBattle {
     public static void main(String[] args) {
         try {

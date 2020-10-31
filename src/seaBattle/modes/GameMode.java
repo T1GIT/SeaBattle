@@ -4,6 +4,16 @@ import seaBattle.players.Player;
 import seaBattle.players.types.UI;
 
 
+/**
+ * Class, implementing {@code GameMode}
+ * include all the steps of the game, with their
+ * own realisations.
+ *  Order:
+ * 1) play - for running game
+ * 2) findPlayer - for filling room, finding all the opponents
+ * 3) fillField - filling players' tables
+ * 4) mainloop - running process of game
+ */
 public interface GameMode {
 
     /**
@@ -29,8 +39,8 @@ public interface GameMode {
 
     /**
      * Is requesting attack and doing it while one player remains
-     * @return array of two {@code Object}s arrays, with context:
-     *      {@code [[name, score], ...] }
+     * @return array of 4 {@code Object}s arrays, with context:
+     *      {@code [[name, kills, wounds, passes], ...] }
      * @throws UI.input.CommandException if user typed command
      */
     Object[][] mainLoop() throws UI.input.CommandException;

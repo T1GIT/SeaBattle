@@ -4,6 +4,12 @@ import seaBattle.elements.Field;
 import seaBattle.players.types.UI;
 
 
+/**
+ * Abstract class for game's players.
+ * Includes all of the methods for interaction between
+ * game and player.
+ * Holding player's field and name.
+ */
 public abstract class Player
 {
     public final static int MAX_NAME_LENGTH = Field.SIZE * 3 + 8;
