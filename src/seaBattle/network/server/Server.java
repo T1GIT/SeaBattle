@@ -12,7 +12,7 @@ import java.util.HashSet;
 
 public class Server extends Thread{
     private ServerSocket serverSocket;
-    public static final String HOST = "localhost";
+    public static final String HOST = "25.50.193.80";
     public static final int PORT = 4444;
     public static final int MAX_CONNECTS = 50;
     public static final int MAX_ROOMS = (MAX_CONNECTS + 1) / 2;
