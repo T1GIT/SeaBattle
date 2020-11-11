@@ -70,7 +70,7 @@ public class UI
                     System.out.println("I am sorry, but boat's coordinates isn't inbound (μ_μ)");
                 } else {
                     int boatLength = Math.max(x2 - x1, y2 - y1) + 1;
-                    if ((x2 != x1 && y2 != y1) || (boatLength > Field.MAX_BOAT_LENGTH))
+                    if ((x2 != x1 && y2 != y1) || (boatLength > Boat.MAX_BOAT_LENGTH))
                         System.out.println("Sorry, it isn't correct coordinates (╯︵╰,)");
                     else if (!this.field.hasInStorage(boatLength))
                         System.out.println("Oh, you have not more boat of this with length " + boatLength + " (╯︵╰,)");

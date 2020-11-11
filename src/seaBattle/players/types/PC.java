@@ -123,7 +123,7 @@ public class PC
         }
 
         public static Boat boat(Field field) {
-            int len = Field.MAX_BOAT_LENGTH;
+            int len = Boat.MAX_BOAT_LENGTH;
             for (; len > 0; len--) if (field.hasInStorage(len)) break;
             while (true) {
                 boolean rotation = rand.bool();

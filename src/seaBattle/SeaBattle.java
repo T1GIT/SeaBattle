@@ -1,5 +1,6 @@
 package seaBattle;
 
+import seaBattle.configuration.Configuration;
 import seaBattle.modes.GameMode;
 import seaBattle.modes.types.Multiplayer;
 import seaBattle.modes.types.Single;

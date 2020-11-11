@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Boat
         implements Serializable
 {
+    public final static byte MAX_BOAT_LENGTH = 4;
     final private byte[] xPos;
     final private byte[] yPos;
     private byte wounds = 0;

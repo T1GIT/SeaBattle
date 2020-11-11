@@ -11,7 +11,6 @@ public class Field
         implements Serializable, Cloneable
 {
     public final static byte SIZE = 10;
-    public final static byte MAX_BOAT_LENGTH = 4;
     private int[] unusedBoats;
     private int[] aliveBoats;
     private Point[][] table;
@@ -38,11 +37,11 @@ public class Field
 
     public Field() {
         this.table = new Point[SIZE][SIZE];
-        this.unusedBoats = new int[MAX_BOAT_LENGTH];
-        this.aliveBoats = new int[MAX_BOAT_LENGTH];
+        this.unusedBoats = new int[Boat.MAX_BOAT_LENGTH];
+        this.aliveBoats = new int[Boat.MAX_BOAT_LENGTH];
         for (Point[] row: table) for (int i = 0; i < SIZE; i++) row[i] = new Point();
-        for (int i = 0; i < MAX_BOAT_LENGTH; i++) this.unusedBoats[i] = MAX_BOAT_LENGTH - i;
-        for (int i = 0; i < MAX_BOAT_LENGTH; i++) this.aliveBoats[i] = 0;
+        for (int i = 0; i < Boat.MAX_BOAT_LENGTH; i++) this.unusedBoats[i] = Boat.MAX_BOAT_LENGTH - i;
+        for (int i = 0; i < Boat.MAX_BOAT_LENGTH; i++) this.aliveBoats[i] = 0;
     }
 
     /**
