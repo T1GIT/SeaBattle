@@ -72,6 +72,7 @@ public abstract class Room<T extends Player> {
      * Writes new attacking and defencing players.
      */
     public void next() {
+        System.out.println(players.size());
         T player;
         int i;
         for (i = move ; i < i + size - 1; i++) {
@@ -102,7 +103,6 @@ public abstract class Room<T extends Player> {
      * @param player for adding
      */
     public void addLoser(T player) {
-        players.remove(player);
         result.add(player);
     }
 

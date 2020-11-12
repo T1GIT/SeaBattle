@@ -56,7 +56,7 @@ public class WEB
 
     @Override
     public void retAnswer(int code) {
-        score[code]++;
+        super.addScore(code);
         if (isHuman()) {
             conn.send(code);
         } else {

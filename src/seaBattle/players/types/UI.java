@@ -120,7 +120,7 @@ public class UI
 
     @Override
     public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed
-        score[code]++;
+        super.addScore(code);
         System.out.println(switch (code) {
             case 0 -> "This place is empty (ﾉ>_<)ﾉ";
             case 1 -> "Wow, it was an accurate shot, Sir  w (ﾟｏﾟ)w";
@@ -203,7 +203,7 @@ public class UI
                 Object[] row;
                 final boolean WITH_HAT = true;
                 int margin = (Player.MAX_NAME_LENGTH) / 2;
-                System.out.println("\n" + " ".repeat(margin - 2) + "ＳＣＯＲＥ ＢＯＡＲＤ\n");
+                System.out.println("\n" + " ".repeat(margin - 2) + "ＳＣＯＲＥ ＢＯＡＲＤ");
                 if (WITH_HAT) System.out.println("PLACE" + " ".repeat(margin) + "NAME" + " ".repeat(margin) + "KILLS  WOUNDS  PASSES");
                 for (int i = 0, place = 1; i < rating.length; i++, place++) {
                     row = rating[i];

@@ -77,7 +77,7 @@ public class PC
 
     @Override
     public void retAnswer(int code) {  // 0 - passed; 1 - wounded; 2 - killed
-        score[code]++;
+        super.addScore(code);
         switch (code) {
             case 0 -> {}
             case 1 -> {

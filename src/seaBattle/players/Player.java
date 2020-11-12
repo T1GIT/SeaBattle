@@ -40,7 +40,7 @@ public abstract class Player
 
     /**
      * @param coor {@code [x, y]} coordinates to attack this player
-     * @return result of attack:
+     * @return result of {@code field.attack()}:
      *      0 - passed
      *      1 - wounded
      *      2 - killed
@@ -76,10 +76,23 @@ public abstract class Player
      * Writes into {@code score} result.
      * MUST TO BE OVERRIDING
      * @param code of answer from {@code field.attack()}
-     *      0 - passed
-     *      1 - wounded
-     *      2 - killed
      */
     public abstract void retAnswer(int code);
 
+    /**
+     * Writes result of action into player's
+     * statistics. Must be called in children's
+     * overrides of {@code retAnswer()}
+     * @param answer code of answer from {@code field.attack()}
+     */
+    protected void addScore(int answer) {
+        switch (answer) {
+            case 0 -> score[0]++;
+            case 1 -> score[1]++;
+            case 2 -> {
+                score[2]++;
+                score[1]++;
+            }
+        }
+    }
 }
