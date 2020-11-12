@@ -15,8 +15,8 @@ public class WEB
 
     public Connection getConn() { return conn; }
 
-    public WEB(String name, Connection connection) {
-        super(name);
+    public WEB(String name, int size, Connection connection) {
+        super(name, size);
         this.conn = connection;
     }
 
@@ -64,7 +64,7 @@ public class WEB
         }
     }
 
-    public void toBot() { this.bot = new PC(); }
+    public void toBot() { this.bot = new PC(field.size); }
 
     public void ready() { this.ready = true; }
 

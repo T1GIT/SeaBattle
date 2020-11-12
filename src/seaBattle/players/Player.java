@@ -12,7 +12,7 @@ import seaBattle.players.types.UI;
  */
 public abstract class Player
 {
-    public final static int MAX_NAME_LENGTH = Field.SIZE * 3 + 8;
+    private final int maxNameLength;
     private final String name;
     protected final Field field;
     /**
@@ -23,6 +23,7 @@ public abstract class Player
      */
     protected final byte[] score;
 
+    public int getMaxNameLength() {  return maxNameLength; }
     public Field getField() { return field; }
     public String getName() { return name; }
     public byte[] getScore() { return score; }
@@ -31,9 +32,10 @@ public abstract class Player
      * Constructs Player.
      * @param name player's name.
      */
-    public Player(String name) {
-        assert (name.length() <= MAX_NAME_LENGTH): "Given name longer then available: " + name;
-        this.field = new Field();
+    public Player(String name, int size) {
+        this.maxNameLength = size * 3 - 8;
+        assert (name.length() <= maxNameLength): "Given name longer then available: " + name;
+        this.field = new Field(size);
         this.name = name;
         this.score = new byte[]{0, 0, 0};
     }

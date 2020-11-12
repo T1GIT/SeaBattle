@@ -16,8 +16,8 @@ public class UI
     private boolean autoBoat = false;
     private boolean autoAction = false;
 
-    public UI(String name) {
-        super(name.equals("") ? "<Unknown>" : name);
+    public UI(String name, int size) {
+        super(name.equals("") ? "Anonimous" : name, size);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class UI
                     System.out.println("I am sorry, but boat's coordinates isn't inbound (μ_μ)");
                 } else {
                     int boatLength = Math.max(x2 - x1, y2 - y1) + 1;
-                    if ((x2 != x1 && y2 != y1) || (boatLength > Boat.MAX_BOAT_LENGTH))
+                    if ((x2 != x1 && y2 != y1) || (boatLength > field.getMaxLength()))
                         System.out.println("Sorry, it isn't correct coordinates (╯︵╰,)");
                     else if (!this.field.hasInStorage(boatLength))
                         System.out.println("Oh, you have not more boat of this with length " + boatLength + " (╯︵╰,)");
@@ -182,15 +182,15 @@ public class UI
         public static void incorrectInput() { System.out.println("<<< Sorry, but your slave cannot understand you  (╥﹏╥)"); }
 
         public static class rating {
-            public static void ladder(Object[][] rating) {
-                final int WIDTH = Player.MAX_NAME_LENGTH;
+            public static void ladder(Object[][] rating, int maxNameLength) {
+                final int WIDTH = maxNameLength;
                 final int HEIGHT = 2;
                 String name; int score, left_margin;
                 System.out.println();
                 for (int i = 0; i < rating.length; i++) {
                     name = (String) rating[i][0];
                     score = (int) rating[i][1];
-                    left_margin = (Player.MAX_NAME_LENGTH - name.length()) / 2;
+                    left_margin = (maxNameLength - name.length()) / 2;
                     System.out.println(" ".repeat(left_margin) + name);
                     System.out.print(" ".repeat(WIDTH * i) + "-".repeat(WIDTH));
                     System.out.printf("\n" + " ".repeat(WIDTH * (i)) + "%-" + WIDTH + "d" + "|", score);
@@ -199,15 +199,15 @@ public class UI
                 System.out.println();
             }
 
-            public static void table(Object[][] rating) { // TODO: remove score. Add kills, wounds, passes
-                Object[] row;
+            public static void table(Object[][] rating, int maxNameLength) { // TODO: remove score. Add kills, wounds, passes
                 final boolean WITH_HAT = true;
-                int margin = (Player.MAX_NAME_LENGTH) / 2;
+                Object[] row;
+                int margin = (maxNameLength) / 2;
                 System.out.println("\n" + " ".repeat(margin - 2) + "ＳＣＯＲＥ ＢＯＡＲＤ\n");
                 if (WITH_HAT) System.out.println("PLACE" + " ".repeat(margin) + "NAME" + " ".repeat(margin) + "KILLS  WOUNDS  PASSES");
                 for (int i = 0, place = 1; i < rating.length; i++, place++) {
                     row = rating[i];
-                    System.out.printf("%5d  %-" + (Player.MAX_NAME_LENGTH) + "s  %-6s %-7s %s\n",
+                    System.out.printf("%5d  %-" + (maxNameLength) + "s  %-6s %-7s %s\n",
                             place, row[0], row[1], row[2], row[3]);
                 }
                 System.out.println();

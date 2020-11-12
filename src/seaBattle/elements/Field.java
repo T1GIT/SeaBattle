@@ -10,11 +10,14 @@ import java.util.ArrayList;
 public class Field
         implements Serializable, Cloneable
 {
-    public final static byte SIZE = 10;
+    public final byte size;
+    private final byte maxBoatLength = 4;
     private int[] unusedBoats;
     private int[] aliveBoats;
     private Point[][] table;
 
+    public int getSize() { return size; }
+    public int getMaxLength() { return maxBoatLength; }
     public Point getPoint(int[] coor) {
         return table[coor[1]][coor[0]];
     }
@@ -29,19 +32,20 @@ public class Field
     }
 
     public static boolean inBounds(int coor) {
-        return coor >= 0 && coor < SIZE;
+        return coor >= 0 && coor < size;
     }
     public static boolean isOver(int x, int y) {
         return !inBounds(x) || !inBounds(y);
     }
 
-    public Field() {
-        this.table = new Point[SIZE][SIZE];
-        this.unusedBoats = new int[Boat.MAX_BOAT_LENGTH];
-        this.aliveBoats = new int[Boat.MAX_BOAT_LENGTH];
-        for (Point[] row: table) for (int i = 0; i < SIZE; i++) row[i] = new Point();
-        for (int i = 0; i < Boat.MAX_BOAT_LENGTH; i++) this.unusedBoats[i] = Boat.MAX_BOAT_LENGTH - i;
-        for (int i = 0; i < Boat.MAX_BOAT_LENGTH; i++) this.aliveBoats[i] = 0;
+    public Field(int size) {
+        this.size = size;
+        this.table = new Point[size][size];
+        this.unusedBoats = new int[maxBoatLength];
+        this.aliveBoats = new int[maxBoatLength];
+        for (Point[] row: table) for (int i = 0; i < size; i++) row[i] = new Point();
+        for (int i = 0; i < maxBoatLength; i++) this.unusedBoats[i] = maxBoatLength - i;
+        for (int i = 0; i < maxBoatLength; i++) this.aliveBoats[i] = 0;
     }
 
     /**
@@ -51,9 +55,9 @@ public class Field
      */
     public boolean placeIsEmpty(int x1, int y1, int x2, int y2) {
         x1 = Math.max(0, x1 - 1);
-        x2 = Math.min(x2 + 1, SIZE - 1);
+        x2 = Math.min(x2 + 1, size - 1);
         y1 = Math.max(0, y1 - 1);
-        y2 = Math.min(y2 + 1, SIZE - 1);
+        y2 = Math.min(y2 + 1, size - 1);
         for (int _x = x1; _x <= x2; _x++) {
             for (int _y = y1; _y <= y2; _y++) {
                 if (!this.table[_y][_x].isEmpty()) return false;
@@ -154,9 +158,9 @@ public class Field
         int[] yPos = boat.getyPos();
         ArrayList<Point> env = new ArrayList<>();
         int x1 = Math.max(0, xPos[0] - 1);
-        int x2 = Math.min(xPos[1] + 1, SIZE - 1);
+        int x2 = Math.min(xPos[1] + 1, size - 1);
         int y1 = Math.max(0, yPos[0] - 1);
-        int y2 = Math.min(yPos[1] + 1, SIZE - 1);
+        int y2 = Math.min(yPos[1] + 1, size - 1);
         for (int _x = x1; _x <= x2; _x++) {
             for (int _y = y1; _y <= y2; _y++) {
                 if (_x < xPos[0] || _x > xPos[1] || _y < yPos[0] || _y > yPos[1]) {
@@ -193,11 +197,11 @@ public class Field
         int state;
         try {
             secured = (Field) this.clone();
-            secured.table = new Point[SIZE][SIZE];
+            secured.table = new Point[size][size];
             secured.aliveBoats = this.aliveBoats.clone();
             secured.unusedBoats = this.unusedBoats.clone();
-            for (int row = 0; row < SIZE; row++) {
-                for (int col = 0; col < SIZE; col++) {
+            for (int row = 0; row < size; row++) {
+                for (int col = 0; col < size; col++) {
                     state = this.table[row][col].getState();
                     secured.table[row][col] = new Point(state == 1 ? 0 : state);
                 }
@@ -211,28 +215,28 @@ public class Field
      * @return array of {@code String}s, ready for printing via {@code System.out.println()}.
      */
     public String[] getPrinted(String name) {
-        final int LINE_LEN = SIZE * 3;
+        final int LINE_LEN = size * 3;
         int leftAlign = (LINE_LEN + 8 - name.length()) / 2;
         int rightAlign = LINE_LEN + 8 - leftAlign - name.length();
-        final String[] res = new String[SIZE + 6];
+        final String[] res = new String[size + 6];
         res[0] = "┏ " + "━━ ".repeat(LINE_LEN / 3 + 2) + "━┓";
         res[1] = "┃" + String.valueOf(' ').repeat(leftAlign) + name + String.valueOf(' ').repeat(rightAlign) + "┃";
         res[2] = "┣ ━━━ ┳ " + "━━ ".repeat(LINE_LEN / 3) + "━┫";
         StringBuilder numbers = new StringBuilder();
         numbers.append("┃     ┃ ");
-        for (int i = 0; i < SIZE; i++) numbers.append(" ").append(i).append(" ");
+        for (int i = 0; i < size; i++) numbers.append(" ").append(i).append(" ");
         numbers.append(" ┃");
         res[3] = numbers.toString();
         res[4] = "┣ ━━━ ╋ " + "━━ ".repeat(LINE_LEN / 3) + "━┫";
-        for (int row = 0; row < SIZE; row++) {
+        for (int row = 0; row < size; row++) {
             StringBuilder str = new StringBuilder();
             str.append("┃  ").append(row).append("  ┃ ");
-            for (int col = 0; col < SIZE; col++)
+            for (int col = 0; col < size; col++)
                 str.append(" ").append(table[row][col].draw()).append(" ");
             str.append(" ┃");
             res[5 + row] = str.toString();
         }
-        res[SIZE + 5] = "┗ ━━━ ┻ " + "━━ ".repeat(LINE_LEN / 3) + "━┛";
+        res[size + 5] = "┗ ━━━ ┻ " + "━━ ".repeat(LINE_LEN / 3) + "━┛";
         return res;
     }
 }

@@ -15,7 +15,7 @@ public class PC
     private int[] lastWoundCoor;
     private int[] lastHitCoor;
 
-    public PC() { super("PC"); }
+    public PC(int size) { super("PC", size); }
 
     @Override
     public boolean isHuman() { return false; }
@@ -103,41 +103,45 @@ public class PC
 
     public static class rand {
         public static int inRange(int minVal, int maxVal) {
-            return minVal + new Random().nextInt(maxVal - minVal + 1);
+            return minVal + new Random().nextInt(maxVal - minVal);
         }
 
-        public static boolean bool() {
-            return Math.random() > 0.5;
-        }
+        public static boolean bool() { return Math.random() > 0.5; }
 
-        public static int[] coor() {
-            int x = inRange(0, Field.SIZE - 1);
-            int y = inRange(0, Field.SIZE - 1);
+        public static int[] coor(int minX, int maxX, int minY, int maxY) {
+            int x = inRange(minX, maxX);
+            int y = inRange(minY, maxY);
             return new int[]{x, y};
         }
 
-        public static int[] coor(int length) {
-            int x = inRange(0, Field.SIZE - length);
-            int y = inRange(0, Field.SIZE - length);
-            return new int[]{x, y};
-        }
+        public static int[] coor(Field field) { return coor(0, field.getMaxLength(), 0, field.getMaxLength()); }
 
         public static Boat boat(Field field) {
-            int len = Boat.MAX_BOAT_LENGTH;
+            int len = field.getMaxLength();
             for (; len > 0; len--) if (field.hasInStorage(len)) break;
+            int[] point1, point2;
+            int bounded = field.getMaxLength() - len;
             while (true) {
                 boolean rotation = rand.bool();
-                int[] point1 = rand.coor(len);
-                int[] point2 = new int[]{rotation ? point1[0] + len - 1 : point1[0], !rotation ? point1[1] + len - 1 : point1[1]};
+                point1 = rand.coor(0, bounded, 0, bounded);
+                point2 = new int[]{
+                        rotation
+                                ? point1[0] + len - 1
+                                : point1[0],
+                        !rotation
+                                ? point1[1] + len - 1
+                                : point1[1]
+                };
                 if  (field.placeIsEmpty(point1, point2)) {
                     return new Boat(point1, point2);
                 }
             }
         }
 
-        public static int[] action(Field field) { // Without logic!
+        public static int[] action(Field field) {
+            int[] coor;
             while (true) {
-                int[] coor = coor();
+                coor = coor(field);
                 if (field.getPoint(coor).isAttackable()) return coor;
             }
         }
