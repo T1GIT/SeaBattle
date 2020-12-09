@@ -199,7 +199,7 @@ public class UI
                 System.out.println();
             }
 
-            public static void table(Object[][] rating) { // TODO: remove score. Add kills, wounds, passes
+            public static void table(Object[][] rating) {
                 Object[] row;
                 final boolean WITH_HAT = true;
                 int margin = (Player.MAX_NAME_LENGTH) / 2;

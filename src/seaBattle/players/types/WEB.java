@@ -11,7 +11,7 @@ public class WEB
         extends Player
 {
     private final Connection conn;
-    private PC bot = null; // TODO: Make bot changing system
+    private PC bot = null;
     private boolean ready = false;
 
     public Connection getConn() { return conn; }
