@@ -28,12 +28,19 @@ public abstract class Player
     public byte[] getScore() { return score; }
 
     /**
-     * Constructs Player.
-     * @param name player's name.
+     * Constructs {@code Player}
+     * @param name player's name
      */
-    public Player(String name) {
+    public Player(String name) { this(name, new Field()); }
+
+    /**
+     * Constructs {@code Player}.
+     * @param name player's name.
+     * @param field for player having
+     */
+    public Player(String name, Field field) {
         assert (name.length() <= MAX_NAME_LENGTH): "Given name longer then available: " + name;
-        this.field = new Field();
+        this.field = field;
         this.name = name;
         this.score = new byte[]{0, 0, 0};
     }

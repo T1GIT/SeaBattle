@@ -16,6 +16,7 @@ public class PC
     private int[] lastHitCoor;
 
     public PC() { super("PC"); }
+    public PC(Field field) { super("PC", field); }
 
     @Override
     public boolean isHuman() { return false; }

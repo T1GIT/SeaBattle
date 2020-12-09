@@ -1,6 +1,5 @@
 package seaBattle.rooms.types;
 
-import seaBattle.network.server.Connection;
 import seaBattle.players.Player;
 import seaBattle.players.types.WEB;
 import seaBattle.rooms.Room;
@@ -24,13 +23,9 @@ public class WebRoom extends Room<WEB> {
         this.connect(player);
     }
 
-    public Connection getConn(int index) { return this.getPlayer(index).getConn(); }
-
     public boolean isLocked() { return this.psw != null; }
 
     public boolean checkPsw(byte[] inPsw) { return security.checkPsw(this.psw, inPsw); }
-
-    public void popPlayer(WEB player) { players.remove(player); }
 
     public static HashMap<String, Object[]> pack(HashMap<String, WebRoom> rooms) {
         HashMap<String, Object[]> res = new HashMap<>(rooms.size());
@@ -42,6 +37,7 @@ public class WebRoom extends Room<WEB> {
                     room.getPlayersIn(),
                     room.size()
             });
+            System.out.println(entry.getKey() + " " + room);
         }
         return res;
     }
@@ -49,11 +45,9 @@ public class WebRoom extends Room<WEB> {
     public static void print(HashMap<String, Object[]> pack) {
         System.out.println(" ".repeat(Player.MAX_NAME_LENGTH / 2) + "\uD835\uDE81\uD835\uDE7E\uD835\uDE7E\uD835\uDE7C\uD835\uDE82");
         Object[] data;
-        int num = 0;
         for (Map.Entry<String, Object[]> entry: pack.entrySet()) {
             data = entry.getValue();
-            System.out.printf("%2d %2s %-" + MAX_NAME_LENGTH + "s %3s \\ %s\n",
-                    num,
+            System.out.printf("%2s %-" + MAX_NAME_LENGTH + "s %3s \\ %s\n",
                     (boolean) data[0] ? "\uD83D\uDD12" : "",
                     entry.getKey(),
                     data[1],

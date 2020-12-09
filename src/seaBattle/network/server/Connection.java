@@ -6,12 +6,14 @@ import seaBattle.modes.GameMode;
 import seaBattle.players.Player;
 import seaBattle.players.types.UI;
 import seaBattle.players.types.WEB;
+import seaBattle.rooms.Room;
 import seaBattle.rooms.types.WebRoom;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Map;
 
 public class Connection
         extends Thread
@@ -65,7 +67,6 @@ public class Connection
     @Override
     public void disconnect() {
         System.out.println("    Client disconnected: " + this.getName());
-        player.toBot();
         if (room != null) {
             if (room.humanIsHere()) {
                 if (room.isFull()) {
@@ -80,7 +81,6 @@ public class Connection
             } else server.freeRooms.remove(roomName, room);
         }
         server.connects.remove(this);
-        System.gc();
     }
 
     @Override
@@ -111,7 +111,6 @@ public class Connection
         }
         player.ready();
         if (room.isReady()) {
-            server.freeRooms.remove(roomName);
             room.sendAll(0);
             Object[][] rating = mainLoop();
             room.sendAll(( Object ) rating);
@@ -131,10 +130,11 @@ public class Connection
         while (true) {
             boat = player.getBoat();
             field.setBoat(boat);
-            if (field.isStorageAvailable()) deny();
-            else break;
+            if (field.isStorageAvailable()) {
+                if (player.isHuman()) deny();
+            } else break;
         }
-        allow();
+        if (player.isHuman()) allow();
     }
 
     @Override
@@ -208,6 +208,7 @@ public class Connection
                 send(2);
                 room.connect(this.player);
                 this.room = room;
+                if (room.isFull()) server.freeRooms.remove(roomName);
                 break;
             }
         }

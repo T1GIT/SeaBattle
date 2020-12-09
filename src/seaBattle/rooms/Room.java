@@ -122,7 +122,7 @@ public abstract class Room<T extends Player> {
             player = result.get(size - i - 1);
             score = player.getScore();
             row[0] = player.getName();
-            for (int j = 0; j < 3; j++) row[j + 1] = score[j];
+            for (int j = 0; j < 3; j++) row[3 - j] = score[j];
         }
         return rating;
     }
